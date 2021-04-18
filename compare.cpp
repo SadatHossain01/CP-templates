@@ -14,11 +14,11 @@ void split(string& s) {
 
 int main(int argc, char* argv[])
 {
-    if (argc != 4) {
-        printf("You have to provide 2 file names and a delimiter name!");
-        return 0;
-    }
     char delimiter;
+    if (argc != 4) {
+        // printf("You have to provide 2 file names and a delimiter name!");
+        delimiter = '\n';
+    }
     if (strcmpi(argv[3], "space") == 0) delimiter = ' ';
     else delimiter = '\n';
     FILE* fp1 = fopen(argv[1], "r");
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         split(s2);
         // if (!s1.empty() && !s2.empty()) cout << s1 << " " << s2 << endl;
         if (s1 != s2) {
-            if (!isMessageShown) { cout << "Mismatch Noticed" << endl; isMessageShown = true; }
+            if (!isMessageShown) { cout << "Mismatch Noticed " << argv[1] << " " << argv[2] << endl; isMessageShown = true; }
             cout << s1 << " " << s2 << endl;
         }
         s1 = "";
