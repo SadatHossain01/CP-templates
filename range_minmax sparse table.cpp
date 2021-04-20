@@ -55,10 +55,6 @@ void _print(T t, V... v)
 #define debug(x...)
 #endif
 
-int max_query(vector<vector<int>>& sparse, int l, int r) {
-    int len = r - l + 1;
-    return max(sparse[l][__lg(len)], sparse[r - (1 << (__lg(len))) + 1][__lg(len)]);
-}
 void range_maximum(vector<int>& vec) {
     int n = vec.size();
     vector<vector<int> > sparse(n, vector<int>(__lg(n) + 1, INT_MAX));
@@ -69,9 +65,9 @@ void range_maximum(vector<int>& vec) {
         }
     }
 }
-int min_query(vector<vector<int>>& sparse, int l, int r) {
+int max_query(vector<vector<int>>& sparse, int l, int r) {
     int len = r - l + 1;
-    return min(sparse[l][__lg(len)], sparse[r - (1 << (__lg(len))) + 1][__lg(len)]);
+    return max(sparse[l][__lg(len)], sparse[r - (1 << (__lg(len))) + 1][__lg(len)]);
 }
 void range_minimum(vector<int>& vec) {
     int n = vec.size();
@@ -82,6 +78,10 @@ void range_minimum(vector<int>& vec) {
             sparse[i][j] = min(sparse[i][j - 1], sparse[i + (1 << (j - 1))][j - 1]);
         }
     }
+}
+int min_query(vector<vector<int>>& sparse, int l, int r) {
+    int len = r - l + 1;
+    return min(sparse[l][__lg(len)], sparse[r - (1 << (__lg(len))) + 1][__lg(len)]);
 }
 
 int main()
