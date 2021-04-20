@@ -3,35 +3,35 @@ using namespace std;
 
 #define endl "\n"
 
-const long long NEUTRAL_ELEMENT = __LONG_LONG_MAX__;
+const int NEUTRAL_ELEMENT = INT_MIN;
 
 struct seg_tree {
     int size;
-    vector <long long> sums;
+    vector <int> maximum;
     void initiate(int n) {
         size = 1;
         while (size < n) size <<= 1;
-        sums.assign(2 * size, 0LL);
+        maximum.assign(2 * size, 0LL);
     }
-    long long combine(long long a, long long b) { return min(a, b); }
+    int combine(int a, int b) { return max(a, b); }
     void build(vector <int>& numbers, int index, int start, int end) {
         if (end - start == 1) {
             if (start < numbers.size()) {
-                sums[index] = numbers[start];
+                maximum[index] = numbers[start];
             }
             return;
         }
         int mid = (start + end) / 2;
         build(numbers, index * 2 + 1, start, mid);
         build(numbers, index * 2 + 2, mid, end);
-        sums[index] = combine(sums[index * 2 + 1], sums[index * 2 + 2]);
+        maximum[index] = combine(maximum[index * 2 + 1], maximum[index * 2 + 2]);
     }
     void build(vector<int>& numbers) {
         build(numbers, 0, 0, size);
     }
     void set(int i, int value, int index, int start, int end) {
         if (end - start == 1) {
-            sums[index] = value;
+            maximum[index] = value;
             return;
         }
         int mid = (start + end) / 2;
@@ -41,21 +41,21 @@ struct seg_tree {
         else {
             set(i, value, index * 2 + 2, mid, end);
         }
-        sums[index] = combine(sums[index * 2 + 1], sums[index * 2 + 2]);
+        maximum[index] = combine(maximum[index * 2 + 1], maximum[index * 2 + 2]);
     }
     void set(int i, int value) {
         set(i, value, 0, 0, size);
     }
-    long long sum(int l, int r, int index, int start, int end) {
+    int find_maximum(int l, int r, int index, int start, int end) {
         if (r <= start || end <= l) return NEUTRAL_ELEMENT;
-        if (start >= l && end <= r) return sums[index];
+        if (start >= l && end <= r) return maximum[index];
         int mid = (start + end) / 2;
-        auto s1 = sum(l, r, index * 2 + 1, start, mid);
-        auto s2 = sum(l, r, index * 2 + 2, mid, end);
+        auto s1 = find_maximum(l, r, index * 2 + 1, start, mid);
+        auto s2 = find_maximum(l, r, index * 2 + 2, mid, end);
         return combine(s1, s2);
     }
-    long long sum(int l, int r) {
-        return sum(l, r, 0, 0, size);
+    int find_maximum(int l, int r) {
+        return find_maximum(l, r, 0, 0, size);
     }
 };
 
@@ -78,7 +78,7 @@ int main()
         if (op == 2) {
             int l, r;
             cin >> l >> r;
-            cout << st.sum(l, r) << endl;
+            cout << st.find_maximum(l, r) << endl;
         }
         else {
             int i, v;
