@@ -82,7 +82,7 @@ void remove(int idx) {
     freq[vec[idx]]--;
     if (freq[vec[idx]] == 0) ans--;
 }
-void process(query& q) {
+void Mo(query& q) {
     while (LEFT > q.l) {
         LEFT--;
         add(LEFT);
@@ -117,7 +117,7 @@ void solve()
     }
     sort(Q.begin(), Q.end(), comp1);
     for (int i = 0; i < q; i++) {
-        process(Q[i]);
+        Mo(Q[i]);
     }
     sort(Q.begin(), Q.end(), comp2);
     for (int i = 0; i < q; i++) {
