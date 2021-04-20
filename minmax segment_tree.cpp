@@ -3,7 +3,7 @@ using namespace std;
 
 #define endl "\n"
 
-const long long NEUTRAL_ELEMENT = LONG_LONG_MAX;
+const long long NEUTRAL_ELEMENT = __LONG_LONG_MAX__;
 
 struct seg_tree {
     int size;

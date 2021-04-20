@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
         // printf("You have to provide 2 file names and a delimiter name!");
         delimiter = '\n';
     }
-    if (strcmpi(argv[3], "space") == 0) delimiter = ' ';
+    if (strcmp(argv[3], "space") == 0) delimiter = ' ';
     else delimiter = '\n';
     FILE* fp1 = fopen(argv[1], "r");
     FILE* fp2 = fopen(argv[2], "r");
