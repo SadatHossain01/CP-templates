@@ -97,6 +97,32 @@ inline int divide(int a, int b) {
 inline void divide_self(int& a, int b) {
     a = divide(a, b);
 }
+int compute_hash_for_a_string(const string& s) {
+    const int p = 31; // choose p = 53 if both uppercase and lowercase letters are allowed
+    int hash_value = 0;
+    const int n = s.size();
+    for (int i = 0; i < n; i++) {
+        add_self(hash_value, mul(s[i] - 'a' + 1, power(p, i + 1)));
+    }
+    return hash_value;
+}
+vector<int> compute_prefix_hash(const string& s) {
+    const int n = s.size();
+    const int p = 31; // choose p = 53 if both uppercase and lowercase letters are allowed
+    int also = p;
+    vector<int>hash_values(n, 0);
+    for (int i = 0; i < n; i++) {
+        hash_values[i] = mul(also, s[i] - 'a' + 1);
+        if (i) add_self(hash_values[i], hash_values[i - 1]);
+        mul_self(also, p);
+    }
+    return hash_values;
+}
+inline int substring_hash(vector<int>& hash_values, int l, int r, const int p = 31) {
+    if (l > r) return 0;
+    if (l == 0) return hash_values[r];
+    return mul(sub(hash_values[r], hash_values[l - 1]), inverse(power(p, l)));
+}
 inline int nCr(int n, int r) {
     if (r > n) return 0;
     if (n == r || r == 0) return 1;
