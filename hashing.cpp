@@ -56,8 +56,6 @@ void _print(T t, V... v)
 #endif
 
 const int MOD = 1e9 + 7;
-const int MX = 2e5 + 10;
-array<int, MX> factorial;
 inline int add(int a, int b) {
     a += b;
     while (a >= MOD) a -= MOD;
@@ -91,32 +89,57 @@ int power(int a, int b) {
 inline int inverse(int a) {
     return power(a, MOD - 2);
 }
-inline int divide(int a, int b) {
-    return mul(a, inverse(b));
-}
-inline void divide_self(int& a, int b) {
-    a = divide(a, b);
-}
-inline int nCr(int n, int r) {
-    if (r > n) return 0;
-    if (n == r || r == 0) return 1;
-    return divide(factorial[n], mul(factorial[r], factorial[n - r]));
-}
-void precompute()
-{
-    factorial[0] = 1;
-    for (int i = 1; i < MX; i++) {
-        factorial[i] = mul(factorial[i - 1], i);
+int compute_hash_for_a_string(const string& s) {
+    const int p = 31; // choose p = 53 if both uppercase and lowercase letters are allowed
+    int hash_value = 0;
+    const int n = s.size();
+    for (int i = 0; i < n; i++) {
+        add_self(hash_value, mul(s[i] - 'a' + 1, power(p, i)));
     }
+    return hash_value;
+}
+vector<int> compute_prefix_hash(const string& s) {
+    const int n = s.size();
+    const int p = 31; // choose p = 53 if both uppercase and lowercase letters are allowed
+    int also = 1;
+    vector<int>hash_values(n, 0);
+    for (int i = 0; i < n; i++) {
+        hash_values[i] = mul(also, s[i] - 'a' + 1);
+        if (i) add_self(hash_values[i], hash_values[i - 1]);
+        mul_self(also, p);
+    }
+    return hash_values;
+}
+vector<int> compute_suffix_hash(const string& s) {
+    const int n = s.size();
+    const int p = 31; // choose p = 53 if both uppercase and lowercase letters are allowed
+    int also = 1;
+    vector<int>hash_values(n, 0);
+    for (int i = n - 1; i >= 0; i--) {
+        hash_values[i] = mul(also, s[i] - 'a' + 1);
+        if (i < n - 1) add_self(hash_values[i], hash_values[i + 1]);
+        mul_self(also, p);
+    }
+    return hash_values;
+}
+int prefix_hash(vector<int>& pref, int l, int r, const int p = 31) {
+    if (l == 0) return pref[r];
+    int inv = inverse(power(p, l));
+    return mul(inv, sub(prefix_hash(pref, 0, r), prefix_hash(pref, 0, l - 1)));
+}
+int suffix_hash(vector<int>& suf, int l, int r, const int p = 31) {
+    const int n = suf.size();
+    if (r == n - 1) return suf[l];
+    int inv = inverse(power(p, n - 1 - r));
+    return mul(inv, sub(suffix_hash(suf, l, n - 1), suffix_hash(suf, r + 1, n - 1)));
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-// #ifndef ONLINE_JUDGE
-//     freopen("in.txt", "r", stdin);
-//     freopen("out.txt", "w", stdout);
-// #endif
-    precompute();
+#ifndef ONLINE_JUDGE
+    freopen("in.txt", "r", stdin);
+    freopen("out.txt", "w", stdout);
+#endif
 }
