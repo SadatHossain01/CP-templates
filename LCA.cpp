@@ -55,69 +55,53 @@ void _print(T t, V... v)
 #define debug(x...)
 #endif
 
-const int MOD = 1e9 + 7;
-const int MX = 2e5 + 10;
-array<int, MX> factorial;
-inline int add(int a, int b) {
-    a += b;
-    while (a >= MOD) a -= MOD;
-    while (a < 0) a += MOD;
-    return a;
-}
-inline void add_self(int& a, int b) {
-    a = add(a, b);
-}
-inline int sub(int a, int b) {
-    return add(a, -b);
-}
-inline void sub_self(int& a, int b) {
-    a = sub(a, b);
-}
-inline int mul(int a, int b) {
-    return (a * 1LL * b) % MOD;
-}
-inline void mul_self(int& a, int b) {
-    a = mul(a, b);
-}
-int power(int a, int b) {
-    int ans = 1;
-    while (b) {
-        if (b & 1) mul_self(ans, a);
-        mul_self(a, a);
-        b >>= 1;
-    }
-    return ans;
-}
-inline int inverse(int a) {
-    return power(a, MOD - 2);
-}
-inline int divide(int a, int b) {
-    return mul(a, inverse(b));
-}
-inline void divide_self(int& a, int b) {
-    a = divide(a, b);
-}
-void precompute()
-{
-    factorial[0] = 1;
-    for (int i = 1; i < MX; i++) {
-        factorial[i] = mul(factorial[i - 1], i);
-    }
-}
-inline int nCr(int n, int r) {
-    static bool isPrecomputationDone = false;
-    if (!isPrecomputationDone) {
-        precompute();
-        isPrecomputationDone = true;
-    }
-    if (r > n) return 0;
-    if (n == r || r == 0) return 1;
-    return divide(factorial[n], mul(factorial[r], factorial[n - r]));
-}
+const int MX = 10000;
+const int LOG = __lg(MX - 1) + 1;
+int n;
+vector<vector<int>>children(MX);
+vector<vector<int>>up(MX, vector<int>(LOG)); //up[i][j] is the 2^j th ancestor of i
+vector<int>depth(MX);
 
+void dfs(int v) {
+    for (auto child : children[v]) {
+        depth[child] = depth[v] + 1;
+        up[child][0] = v;
+        for (int j = 1; j < LOG; j++) {
+            up[child][j] = up[up[child][j - 1]][j - 1];
+        }
+        dfs(child);
+    }
+}
+int get_LCA(int a, int b) {
+    static bool isDFSdone = false;
+    if (!isDFSdone) {
+        dfs(0);
+        isDFSdone = true;
+    }
+    if (depth[a] < depth[b]) swap(a, b);
+    int k = depth[a] - depth[b];
+    for (int j = LOG - 1; j >= 0; j--) {
+        if (k & (1 << j)) {
+            a = up[a][j];
+        }
+    }
+    if (a == b) return a;
+    for (int j = LOG - 1; j >= 0; j--) {
+        if (up[a][j] != up[b][j]) {
+            a = up[a][j];
+            b = up[b][j];
+        }
+    }
+    return up[a][0];
+}
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
+#ifndef ONLINE_JUDGE
+    freopen("in.txt", "r", stdin);
+    freopen("out.txt", "w", stdout);
+#endif
+
 }
