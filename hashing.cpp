@@ -133,6 +133,59 @@ int suffix_hash(vector<int>& suf, int l, int r, const int p = 31) {
     int inv = inverse(power(p, n - 1 - r));
     return mul(inv, sub(suffix_hash(suf, l, n - 1), suffix_hash(suf, r + 1, n - 1)));
 }
+string longestPalindromicSubstring(const string& s) {
+    const int n = s.size();
+    vector<int>prefix_hash_values = compute_prefix_hash(s);
+    vector<int>suffix_hash_values = compute_suffix_hash(s);
+    int start = 0, end = 0;
+    int low, high, middle;
+    for (int i = 0; i < n; i++) {
+        if (min(2 * min(n - 1 - i, i) + 1, 2 * min(n - 1 - i, i - 1) + 2) <= end - start + 1) continue; //i + 1 + (n - 1 -i) is the best possible result from this position
+        //odd lengthed ones
+        low = 0;
+        high = min(i, n - 1 - i);
+        while (low <= high) {
+            middle = (low + high) / 2;
+            if (prefix_hash(prefix_hash_values, i - middle, i + middle) == suffix_hash(suffix_hash_values, i - middle, i + middle)) {
+                if (2 * middle + 1 > end - start + 1) {
+                    end = i + middle;
+                    start = i - middle;
+                }
+                low = middle + 1;
+            }
+            else high = middle - 1;
+        }
+        //even lengthed ones  3, 2, 1 < "string" > 0, 1, 2
+        low = 0;
+        high = min(n - 1 - i, i - 1);
+        while (low <= high) {
+            middle = (low + high) / 2;
+            if (prefix_hash(prefix_hash_values, i - middle - 1, i + middle) == suffix_hash(suffix_hash_values, i - middle - 1, i + middle)) {
+                if (2 * middle + 2 > end - start + 1) {
+                    end = i + middle;
+                    start = i - middle - 1;
+                }
+                low = middle + 1;
+            }
+            else high = middle - 1;
+        }
+        //even lengthed ones 2, 1, 0 < "string" > 1, 2, 3
+        low = 0;
+        high = min(n - 2 - i, i);
+        while (low <= high) {
+            middle = (low + high) / 2;
+            if (prefix_hash(prefix_hash_values, i - middle, i + middle + 1) == suffix_hash(suffix_hash_values, i - middle, i + middle + 1)) {
+                if (2 * middle + 2 > end - start + 1) {
+                    end = i + middle + 1;
+                    start = i - middle;
+                }
+                low = middle + 1;
+            }
+            else high = middle - 1;
+        }
+    }
+    return s.substr(start, end - start + 1);
+}
 
 int main()
 {
