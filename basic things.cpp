@@ -114,7 +114,17 @@ inline int nCr(int n, int r) {
     if (n == r || r == 0) return 1;
     return divide(factorial[n], mul(factorial[r], factorial[n - r]));
 }
-
+int shortestSubarraySum(vector<int>& a) {
+    int sum = 0;
+    int ans = INT_MIN;
+    const int n = a.size();
+    for (int i = 0; i < n; i++) {
+        sum += a[i];
+        ans = max(ans, sum);
+        sum = max(sum, 0);
+    }
+    return ans;
+}
 
 int main()
 {
