@@ -70,7 +70,7 @@ int main()
     int t;
     cin >> t;
     for (int tc = 1; tc <= t; tc++) {
-        cout << "Case #" << tc << ": ";
+        // cout << "Case #" << tc << ": ";
         solve();
     }
 }
