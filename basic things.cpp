@@ -114,6 +114,17 @@ inline int nCr(int n, int r) {
     if (n == r || r == 0) return 1;
     return divide(factorial[n], mul(factorial[r], factorial[n - r]));
 }
+inline int nPr(int n, int r) {
+    static bool isPrecomputationDone = false;
+    if (!isPrecomputationDone) {
+        precompute();
+        isPrecomputationDone = true;
+    }
+    if (r > n) return 0;
+    if (r == 0) return 1;
+    if (n == r) return factorial[n];
+    return divide(factorial[n], factorial[n - r]);
+}
 int shortestSubarraySum(vector<int>& a) {
     int sum = 0;
     int ans = INT_MIN;
