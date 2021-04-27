@@ -55,7 +55,9 @@ void _print(T t, V... v)
 #define debug(x...)
 #endif
 
+const int MX = 1e6 + 5;
 const int MOD = 1e9 + 7;
+int POWER[MX], INV[MX];
 inline int add(int a, int b) {
     a += b;
     while (a >= MOD) a -= MOD;
@@ -185,6 +187,37 @@ string longestPalindromicSubstring(const string& s) {
         }
     }
     return s.substr(start, end - start + 1);
+}
+void precompute_for_version_2() {
+    const int p = 31; // choose p = 53 if both uppercase and lowercase letters are allowed
+    POWER[0] = 1;
+    INV[0] = 1;
+    int inv_of_p = inverse(p);
+    for (int i = 1; i < MX; i++) {
+        POWER[i] = mul(POWER[i - 1], p);
+        INV[i] = INV[i - 1];
+        mul_self(INV[i], inv_of_p);
+    }
+}
+int compute_hash_for_a_string_version_2(const string& s) {
+    const int p = 31; // choose p = 53 if both uppercase and lowercase letters are allowed
+    int hash_value = 0;
+    const int n = s.size();
+    for (int i = 0; i < n; i++) {
+        add_self(hash_value, mul(s[i] - 'a' + 1, POWER[i]));
+    }
+    return hash_value;
+}
+int prefix_hash_version_2(vector<int>& pref, int l, int r, const int p = 31) {
+    if (l == 0) return pref[r];
+    int inv = INV[l];
+    return mul(inv, sub(prefix_hash(pref, 0, r), prefix_hash(pref, 0, l - 1)));
+}
+int suffix_hash_version_2(vector<int>& suf, int l, int r, const int p = 31) {
+    const int n = suf.size();
+    if (r == n - 1) return suf[l];
+    int inv = INV[n - 1 - r];
+    return mul(inv, sub(suffix_hash(suf, l, n - 1), suffix_hash(suf, r + 1, n - 1)));
 }
 
 int main()
