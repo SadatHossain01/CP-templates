@@ -2,6 +2,7 @@
 using namespace std;
 
 #define endl "\n"
+typedef long long ll;
 
 void __print(int x)
 {
