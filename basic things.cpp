@@ -136,6 +136,15 @@ int shortestSubarraySum(vector<int>& a) {
     }
     return ans;
 }
+void string_decrement(string& s) {
+    for (int i = s.size() - 1; i >= 0; i--) {
+        if (s[i] != '0') {
+            s[i]--;
+            break;
+        }
+        else s[i] = '9';
+    }
+}
 
 int main()
 {
