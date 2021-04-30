@@ -3,10 +3,9 @@ using namespace std;
 
 #define endl "\n"
 
-const long long NEUTRAL_ELEMENT = 0;
-
 struct seg_tree {
     int size;
+    const long long NEUTRAL_ELEMENT = 0;
     vector <long long> sums;
     void initiate(int n) {
         size = 1;
