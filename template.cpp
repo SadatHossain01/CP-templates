@@ -56,12 +56,18 @@ void _print(T t, V... v)
 #define debug(x...)
 #endif
 
+clock_t startTime;
+double getCurrentTime() {
+    return (double) (clock() - startTime) / CLOCKS_PER_SEC;
+}
+
 void solve()
 {
 }
 
 int main()
 {
+    startTime = clock();
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 #ifndef ONLINE_JUDGE
@@ -74,4 +80,5 @@ int main()
         // cout << "Case #" << tc << ": ";
         solve();
     }
+    cerr << "Time elapsed: " << getCurrentTime() << " seconds" endl;
 }
