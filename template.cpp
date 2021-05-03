@@ -80,5 +80,7 @@ int main()
         // cout << "Case #" << tc << ": ";
         solve();
     }
-    cerr << "Time elapsed: " << getCurrentTime() << " seconds" endl;
+#ifndef ONLINE_JUDGE
+    cerr << "Time elapsed: " << getCurrentTime() << " seconds" << endl;
+#endif
 }
