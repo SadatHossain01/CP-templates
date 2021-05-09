@@ -2,132 +2,81 @@
 using namespace std;
 
 #define endl "\n"
+typedef long long ll;
 
-void __print(int x)
-{
-    cerr << x;
-}
-void __print(long x) { cerr << x; }
-void __print(long long x) { cerr << x; }
-void __print(unsigned x) { cerr << x; }
-void __print(unsigned long x) { cerr << x; }
-void __print(unsigned long long x) { cerr << x; }
-void __print(float x) { cerr << x; }
-void __print(double x) { cerr << x; }
-void __print(long double x) { cerr << x; }
-void __print(char x) { cerr << '\'' << x << '\''; }
-void __print(const char* x) { cerr << '\"' << x << '\"'; }
-void __print(const string& x) { cerr << '\"' << x << '\"'; }
-void __print(bool x) { cerr << (x ? "true" : "false"); }
-
-template <typename T, typename V>
-void __print(const pair<T, V>& x)
-{
-    cerr << '{';
-    __print(x.first);
-    cerr << ',';
-    __print(x.second);
-    cerr << '}';
-}
-template <typename T>
-void __print(const T& x)
-{
-    int f = 0;
-    cerr << '{';
-    for (auto& i : x)
-        cerr << (f++ ? "," : ""), __print(i);
-    cerr << "}";
-}
-void _print() { cerr << "]\n"; }
-template <typename T, typename... V>
-void _print(T t, V... v)
-{
-    __print(t);
-    if (sizeof...(v))
-        cerr << ", ";
-    _print(v...);
-}
-#ifndef ONLINE_JUDGE
-#define debug(x...)               \
-    cerr << "[" << #x << "] = ["; \
-    _print(x)
-#else
-#define debug(x...)
-#endif
-
-const int mx = 2000100;
-const int sz = 3e4 + 20;
-const int BLOCK = 600;
-int ans;
-int LEFT = 0, RIGHT = -1;
-array<int, mx>freq;
-array<int, sz> vec;
-struct query {
-    int l, r, idx, ans;
+struct Query {
+    int l, r, index, ans;
 };
-bool comp1(const query& q1, const query& q2) {
-    if (q1.l / BLOCK != q2.l / BLOCK) return q1.l < q2.l;
-    return q1.r < q2.r;
-}
-bool comp2(const query& q1, const query& q2) {
-    return q1.idx < q2.idx;
-}
-void add(int idx) {
-    if (idx < 0 || idx >= vec.size()) return;
-    freq[vec[idx]]++;
-    if (freq[vec[idx]] == 1) ans++;
-}
-void remove(int idx) {
-    if (idx < 0 || idx >= vec.size()) return;
-    freq[vec[idx]]--;
-    if (freq[vec[idx]] == 0) ans--;
-}
-void Mo(query& q) {
-    while (LEFT > q.l) {
-        LEFT--;
-        add(LEFT);
+const int BLOCK_SIZE = 200;
+const int MAX_VALUE = 1e6 + 10;
+int n, q, ans;
+int current_left = 0, current_right = -1;
+vector<int>numbers;
+vector<int>frequency(MAX_VALUE);
+vector<Query>questions;
+void add(int index) {
+    if (index < 0 || index >= (int) numbers.size()) return;
+    int element = numbers[index];
+    frequency[element]++;
+    if (frequency[element] == 1) {
+        ans++;
     }
-    while (RIGHT < q.r) {
-        RIGHT++;
-        add(RIGHT);
+}
+void remove(int index) {
+    if (index < 0 || index >= (int) numbers.size()) return;
+    int element = numbers[index];
+    frequency[element]--;
+    if (frequency[element] == 0) ans--;
+}
+void Mo(Query& that) {
+    while (current_left > that.l) {
+        current_left--;
+        add(current_left);
     }
-    while (LEFT < q.l) {
-        remove(LEFT);
-        LEFT++;
+    while (current_right < that.r) {
+        current_right++;
+        add(current_right);
     }
-    while (RIGHT > q.r) {
-        remove(RIGHT);
-        RIGHT--;
+    while (current_left < that.l) {
+        remove(current_left);
+        current_left++;
     }
-    q.ans = ans;
+    while (current_right > that.r) {
+        remove(current_right);
+        current_right--;
+    }
+    that.ans = ans;
 }
 void solve()
 {
-    int n;
-    cin >> n;
-    for (int i = 0; i < n; i++) cin >> vec[i];
-    int q;
-    cin >> q;
-    vector<query>Q(q);
+    scanf("%d", &n);
+    numbers.resize(n);
+    for (int i = 0; i < n; i++) scanf("%d", &numbers[i]);
+    scanf("%d", &q);
+    questions.resize(q);
     for (int i = 0; i < q; i++) {
-        cin >> Q[i].l >> Q[i].r;
-        Q[i].idx = i;
-        Q[i].l--;
-        Q[i].r--;
+        scanf("%d%d", &questions[i].l, &questions[i].r);
+        questions[i].l--;
+        questions[i].r--;
+        questions[i].index = i;
     }
-    sort(Q.begin(), Q.end(), comp1);
+    sort(questions.begin(), questions.end(), [&](const Query& p, const Query& q) {
+        if (p.l / BLOCK_SIZE != q.l / BLOCK_SIZE)
+            return make_pair(p.l, p.r) < make_pair(q.l, q.r);
+        return (p.l / BLOCK_SIZE & 1) ? (p.r < q.r) : (p.r > q.r);
+    });
     for (int i = 0; i < q; i++) {
-        Mo(Q[i]);
+        Mo(questions[i]);
     }
-    sort(Q.begin(), Q.end(), comp2);
+    sort(questions.begin(), questions.end(), [&](const Query& p, const Query& q) {
+        return p.index < q.index;
+    });
     for (int i = 0; i < q; i++) {
-        cout << Q[i].ans << endl;
+        printf("%d\n", questions[i].ans);
     }
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
     solve();
 }
