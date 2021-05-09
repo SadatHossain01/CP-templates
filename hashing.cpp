@@ -211,13 +211,13 @@ int compute_hash_for_a_string_version_2(const string& s) {
 int prefix_hash_version_2(vector<int>& pref, int l, int r, const int p = 31) {
     if (l == 0) return pref[r];
     int inv = INV[l];
-    return mul(inv, sub(prefix_hash(pref, 0, r), prefix_hash(pref, 0, l - 1)));
+    return mul(inv, sub(prefix_hash_version_2(pref, 0, r), prefix_hash_version_2(pref, 0, l - 1)));
 }
 int suffix_hash_version_2(vector<int>& suf, int l, int r, const int p = 31) {
     const int n = suf.size();
     if (r == n - 1) return suf[l];
     int inv = INV[n - 1 - r];
-    return mul(inv, sub(suffix_hash(suf, l, n - 1), suffix_hash(suf, r + 1, n - 1)));
+    return mul(inv, sub(suffix_hash_version_2(suf, l, n - 1), suffix_hash_version_2(suf, r + 1, n - 1)));
 }
 
 int main()
