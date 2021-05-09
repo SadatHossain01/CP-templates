@@ -3,15 +3,14 @@ using namespace std;
 
 #define endl "\n"
 
-const int NEUTRAL_ELEMENT = INT_MIN;
-
 struct seg_tree {
     int size;
+    const int NEUTRAL_ELEMENT = INT_MIN;
     vector <int> maximum;
     void initiate(int n) {
         size = 1;
         while (size < n) size <<= 1;
-        maximum.assign(2 * size, 0LL);
+        maximum.assign(2 * size, 0);
     }
     int combine(int a, int b) { return max(a, b); }
     void build(vector <int>& numbers, int index, int start, int end) {
