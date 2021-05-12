@@ -28,6 +28,7 @@ void tarjan(int node) {
         }
     }
     if (inTime[node] == lowLink[node]) {
+        //the following loop gives you the chance to process the nodes that belong to this SCC
         cout << "SCC #" << ++SCC << endl;
         int u;
         while (true) {
