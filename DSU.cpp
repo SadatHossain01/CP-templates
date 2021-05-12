@@ -64,9 +64,3 @@ private:
     // otherwise: parent
     std::vector<int> parent_or_size;
 };
-
-int main()
-{
-
-}
-

@@ -80,8 +80,3 @@ void solve()
         printf("%d\n", questions[i].ans);
     }
 }
-
-int main()
-{
-    solve();
-}
