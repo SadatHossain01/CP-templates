@@ -3,7 +3,7 @@ using namespace std;
 
 #define endl "\n"
 
-int n, m, a, b, timer = 1, SCC;
+int n, m, timer = 1, SCC;
 vector<vector<int>>adj;
 vector<bool>visited, onStack;
 vector<int>inTime, lowLink;
