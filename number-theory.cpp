@@ -17,7 +17,21 @@ void sieve(int n) {
         if (isPrime[i]) Primes.push_back(i);
     }
 }
-
+int NumberOfDivisors(int n) {
+    int ans = 1;
+    for (int i = 0; i < Primes.size() && Primes[i] * Primes[i] <= n; i++) {
+        int times = 0, prime = Primes[i];
+        while (n % prime == 0) {
+            times++;
+            n /= prime;
+        }
+        ans *= times + 1;
+    }
+    if (n > 1) {
+        ans *= 2;
+    }
+    return ans;
+}
 int main()
 {
     return 0;
