@@ -50,6 +50,7 @@ int gcd(int a, int b, int& x, int& y) {
 inline int inverse(int a) {
     int x, y;
     int whatever = gcd(a, MOD, x, y);
+    while (x < 0) x += MOD;
     return x;
 }
 inline int divide(int a, int b) {
