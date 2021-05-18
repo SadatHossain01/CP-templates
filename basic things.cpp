@@ -3,9 +3,9 @@ using namespace std;
 
 #define endl "\n"
 
-const int MOD = 1e9 + 7;
 const int MX = 2e5 + 10;
 array<int, MX> factorial;
+const int MOD = 1e9 + 7;
 inline int add(int a, int b) {
     a += b;
     while (a >= MOD) a -= MOD;
