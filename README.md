@@ -1,4 +1,5 @@
 # **My Repository for CP Stuffs**
+---
 Currently, this repository contains:
 * Disjoint Set Union
 * Lowest Common Ancestor
@@ -9,8 +10,8 @@ Currently, this repository contains:
 * Sparse Table
 * Some Basic Number Theory & Modular Arithmetic Stuffs
 * My Templates
-
-Some other useful stuffs are also here:
+___
+Some other useful stuffs that are also here:
 
 * [The AtCoder Library](https://github.com/atcoder/ac-library)
 * [CP Handbook](https://cses.fi/book/book.pdf)
