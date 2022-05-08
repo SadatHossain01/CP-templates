@@ -12,6 +12,7 @@ stack<int>st;
 void tarjan(int node) {
     visited[node] = true;
     inTime[node] = lowLink[node] = timer++;
+    //low link is the smallest node id reachable from that node including the node itself
     onStack[node] = true;
     st.push(node);
     for (int neighbour : adj[node]) {
