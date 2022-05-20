@@ -6,21 +6,24 @@ using namespace std;
 void split(string& s) {
     int idx = 0;
     while (idx < s.size() && s[idx] == ' ') idx++;
-    for (int j = 0; j < idx; j++) { s.erase(s.begin()); }
+    for (int j = 0; j < idx; j++) {
+        s.erase(s.begin());
+    }
     idx = s.size() - 1;
     while (idx >= 0 && s[idx] == ' ') idx--;
     for (int i = s.size() - 1; i > idx; i--) s.erase(s.begin() + i);
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     char delimiter;
     if (argc != 4) {
         // printf("You have to provide 2 file names and a delimiter name!");
         delimiter = '\n';
     }
-    if (strcmp(argv[3], "space") == 0) delimiter = ' ';
-    else delimiter = '\n';
+    if (strcmp(argv[3], "space") == 0)
+        delimiter = ' ';
+    else
+        delimiter = '\n';
     FILE* fp1 = fopen(argv[1], "r");
     FILE* fp2 = fopen(argv[2], "r");
     string s1, s2;
@@ -42,7 +45,11 @@ int main(int argc, char* argv[])
         split(s2);
         // if (!s1.empty() && !s2.empty()) cout << s1 << " " << s2 << endl;
         if (s1 != s2) {
-            if (!isMessageShown) { cout << "Mismatch Noticed " << argv[1] << " " << argv[2] << endl; isMessageShown = true; }
+            if (!isMessageShown) {
+                cout << "Mismatch Noticed " << argv[1] << " " << argv[2]
+                     << endl;
+                isMessageShown = true;
+            }
             cout << s1 << " " << s2 << endl;
         }
         s1 = "";

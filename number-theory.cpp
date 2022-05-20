@@ -2,8 +2,8 @@
 using namespace std;
 
 const int mx = 1e7 + 5;
-bitset<mx>isPrime;
-vector<int>Primes;
+bitset<mx> isPrime;
+vector<int> Primes;
 void sieve(int n) {
     isPrime.set();
     isPrime[0] = isPrime[1] = false;
@@ -32,7 +32,4 @@ int NumberOfDivisors(int n) {
     }
     return ans;
 }
-int main()
-{
-    return 0;
-}
+int main() { return 0; }

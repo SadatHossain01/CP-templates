@@ -20,52 +20,49 @@ void __print(bool x) { cerr << (x ? "true" : "false"); }
 
 template <typename T, typename V>
 void __print(const pair<T, V>& x) {
-  cerr << '{';
-  __print(x.first);
-  cerr << ',';
-  __print(x.second);
-  cerr << '}';
+    cerr << '{';
+    __print(x.first);
+    cerr << ',';
+    __print(x.second);
+    cerr << '}';
 }
 template <typename T>
 void __print(const T& x) {
-  int f = 0;
-  cerr << '{';
-  for (auto& i : x) cerr << (f++ ? "," : ""), __print(i);
-  cerr << "}";
+    int f = 0;
+    cerr << '{';
+    for (auto& i : x) cerr << (f++ ? "," : ""), __print(i);
+    cerr << "}";
 }
 void _print() { cerr << "]\n"; }
 template <typename T, typename... V>
 void _print(T t, V... v) {
-  __print(t);
-  if (sizeof...(v)) cerr << ", ";
-  _print(v...);
+    __print(t);
+    if (sizeof...(v)) cerr << ", ";
+    _print(v...);
 }
 #ifndef ONLINE_JUDGE
-#define debug(x...)             \
-  cerr << "[" << #x << "] = ["; \
-  _print(x)
+#define debug(x...)               \
+    cerr << "[" << #x << "] = ["; \
+    _print(x)
 #else
 #define debug(x...)
 #endif
 
-void solve() {
-  
-}
+void solve() {}
 
 int main() {
-  ios_base::sync_with_stdio(false);
-  cin.tie(NULL);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
 
-  #ifndef ONLINE_JUDGE
+#ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
     freopen("out.txt", "w", stdout);
-  #endif
+#endif
 
-  int t;
-  cin >> t;
+    int t;
+    cin >> t;
 
-  for (int tc = 1; tc <= t; tc++) {
-    solve();
-  }
-
+    for (int tc = 1; tc <= t; tc++) {
+        solve();
+    }
 }

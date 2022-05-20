@@ -6,12 +6,13 @@ using namespace std;
 const int MX = 10000;
 const int LOG = __lg(MX - 1) + 1;
 int n;
-vector<vector<int>>children(MX);
-vector<vector<int>>adjacent(MX);
-vector<vector<int>>up(MX, vector<int>(LOG)); //up[i][j] is the 2^j th ancestor of i
-vector<int>depth(MX);
+vector<vector<int>> children(MX);
+vector<vector<int>> adjacent(MX);
+vector<vector<int>> up(
+    MX, vector<int>(LOG));  // up[i][j] is the 2^j th ancestor of i
+vector<int> depth(MX);
 
-//this version is applicable if inputs are given in node-children form
+// this version is applicable if inputs are given in node-children form
 void dfs(int v) {
     for (auto child : children[v]) {
         depth[child] = depth[v] + 1;
@@ -22,7 +23,7 @@ void dfs(int v) {
         dfs(child);
     }
 }
-//this version is applicable if inputs are given in edge form
+// this version is applicable if inputs are given in edge form
 void dfs(int v, int parent) {
     for (auto neighbour : adjacent[v]) {
         if (neighbour == parent) continue;
@@ -63,7 +64,7 @@ int get_LCA(int a, int b) {
     static bool isDFSdone = false;
     if (!isDFSdone) {
         dfs(0);
-        //or, dfs(0, -1);
+        // or, dfs(0, -1);
         isDFSdone = true;
     }
     if (depth[a] < depth[b]) swap(a, b);

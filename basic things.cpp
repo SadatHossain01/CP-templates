@@ -12,21 +12,11 @@ inline int add(int a, int b) {
     while (a < 0) a += MOD;
     return a;
 }
-inline void add_self(int& a, int b) {
-    a = add(a, b);
-}
-inline int sub(int a, int b) {
-    return add(a, -b);
-}
-inline void sub_self(int& a, int b) {
-    a = sub(a, b);
-}
-inline int mul(int a, int b) {
-    return (a * 1LL * b) % MOD;
-}
-inline void mul_self(int& a, int b) {
-    a = mul(a, b);
-}
+inline void add_self(int& a, int b) { a = add(a, b); }
+inline int sub(int a, int b) { return add(a, -b); }
+inline void sub_self(int& a, int b) { a = sub(a, b); }
+inline int mul(int a, int b) { return (a * 1LL * b) % MOD; }
+inline void mul_self(int& a, int b) { a = mul(a, b); }
 int power(int a, int b) {
     int ans = 1;
     while (b) {
@@ -53,14 +43,9 @@ inline int inverse(int a) {
     while (x < 0) x += MOD;
     return x;
 }
-inline int divide(int a, int b) {
-    return mul(a, inverse(b));
-}
-inline void divide_self(int& a, int b) {
-    a = divide(a, b);
-}
-void precompute()
-{
+inline int divide(int a, int b) { return mul(a, inverse(b)); }
+inline void divide_self(int& a, int b) { a = divide(a, b); }
+void precompute() {
     factorial[0] = 1;
     for (int i = 1; i < MX; i++) {
         factorial[i] = mul(factorial[i - 1], i);
@@ -103,8 +88,8 @@ void string_decrement(string& s) {
         if (s[i] != '0') {
             s[i]--;
             break;
-        }
-        else s[i] = '9';
+        } else
+            s[i] = '9';
     }
 }
 
