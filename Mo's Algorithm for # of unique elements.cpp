@@ -4,6 +4,8 @@ using namespace std;
 #define endl "\n"
 typedef long long ll;
 
+// SPOJ Problem DQUERY
+
 struct Query {
     int l, r, index, ans;
 };

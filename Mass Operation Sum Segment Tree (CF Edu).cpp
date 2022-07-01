@@ -33,17 +33,13 @@ struct seg_tree {
     void add(int l, int r, int v) { add(l, r, v, 0, 0, size); }
 
     long long get(int i, int index, int start, int end) {
-        if (end - start == 1) {
-            return operations[index];
-        }
+        if (end - start == 1) return operations[index];
         int mid = (start + end) / 2;
         long long ret;
-
         if (i < mid)
             ret = get(i, index * 2 + 1, start, mid);
         else
             ret = get(i, index * 2 + 2, mid, end);
-
         return ret + operations[index];
     }
 

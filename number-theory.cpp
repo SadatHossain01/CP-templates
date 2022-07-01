@@ -17,6 +17,25 @@ void sieve(int n) {
         if (isPrime[i]) Primes.push_back(i);
     }
 }
+int eulerPhi(int n) {
+    int res = n;
+    int sqrtn = sqrt(n);
+    for (int i = 0; i < Primes.size() && Primes[i] <= sqrtn; i++) {
+        if (n % Primes[i] == 0) {
+            while (n % Primes[i] == 0) {
+                n /= Primes[i];
+            }
+            sqrtn = sqrt (n);
+            res /= Primes[i];
+            res *= (Primes[i] - 1);
+        }
+    }
+    if (n != 1) {
+        res /= n;
+        res *= n - 1;
+    }
+    return res;
+}
 int NumberOfDivisors(int n) {
     int ans = 1;
     for (int i = 0; i < Primes.size() && Primes[i] * Primes[i] <= n; i++) {
