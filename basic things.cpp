@@ -37,13 +37,14 @@ int gcd(int a, int b, int& x, int& y) {
     }
     return a1;
 }
-inline int inverse(int a) {
+int modInverse(int a, int m) {
     int x, y;
-    int whatever = gcd(a, MOD, x, y);
-    while (x < 0) x += MOD;
+    int g = gcd(a, m, x, y);
+    while (x < 0) x += m;
     return x;
 }
-inline int divide(int a, int b) { return mul(a, inverse(b)); }
+
+inline int divide(int a, int b) { return mul(a, modInverse(b, MOD)); }
 inline void divide_self(int& a, int b) { a = divide(a, b); }
 void precompute() {
     factorial[0] = 1;
@@ -71,26 +72,6 @@ inline int nPr(int n, int r) {
     if (r == 0) return 1;
     if (n == r) return factorial[n];
     return divide(factorial[n], factorial[n - r]);
-}
-int shortestSubarraySum(vector<int>& a) {
-    int sum = 0;
-    int ans = INT_MIN;
-    const int n = a.size();
-    for (int i = 0; i < n; i++) {
-        sum += a[i];
-        ans = max(ans, sum);
-        sum = max(sum, 0);
-    }
-    return ans;
-}
-void string_decrement(string& s) {
-    for (int i = s.size() - 1; i >= 0; i--) {
-        if (s[i] != '0') {
-            s[i]--;
-            break;
-        } else
-            s[i] = '9';
-    }
 }
 
 __int128 read() {
