@@ -4,9 +4,15 @@ using namespace std;
 #define endl "\n"
 
 const int MX = 1e6 + 5;
-const int MOD = 1e9 + 7;
-int POWER[MX], INV[MX];
-int power(int a, int b) {
+const int p1 = 31, p2 = 37;
+const int MOD1 = 1e9 + 7;
+const int MOD2 = 1e9 + 9;
+// use double hashing for caution
+// if both hash values match, then same string
+// else different
+vector<int> POWER1(MX), POWER2(MX);
+vector<int> INV1(MX), INV2(MX);
+int power(int a, int b, int MOD) {
     int ans = 1;
     while (b) {
         if (b & 1) ans = (ans * 1LL * a) % MOD;
@@ -32,22 +38,21 @@ int modInverse(int a, int m) {
     while (x < 0) x += m;
     return x;
 }
-void precompute() {
-    const int p = 31;  // choose p = 53 if both uppercase and lowercase letters
-                       // are allowed
+void precompute(const int p, const int MOD, vector<int>& POWER,
+                vector<int>& INV) {
+    // 31 if single case
+    // choose p = 53 if both uppercase and lowercase letters
     POWER[0] = 1;
     INV[0] = 1;
     int inv_of_p = modInverse(p, MOD);
     for (int i = 1; i < MX; i++) {
         POWER[i] = (POWER[i - 1] * 1LL * p) % MOD;
-        INV[i] = INV[i - 1];
-        INV[i] = (INV[i] * 1LL * inv_of_p) % MOD;
+        INV[i] = (INV[i - 1] * 1LL * inv_of_p) % MOD;
     }
 }
-int compute_hash_for_a_string(const string& s) {
+int compute_hash_for_a_string(const string& s, const int p, const int MOD,
+                              const vector<int>& POWER) {
     // call precompute() first
-    const int p = 31;  // choose p = 53 if both uppercase and lowercase letters
-                       // are allowed
     int hash_value = 0;
     const int n = s.size();
     for (int i = 0; i < n; i++) {
@@ -56,10 +61,8 @@ int compute_hash_for_a_string(const string& s) {
     }
     return hash_value;
 }
-vector<int> compute_prefix_hash(const string& s) {
+vector<int> compute_prefix_hash(const string& s, const int p, const int MOD) {
     const int n = s.size();
-    const int p = 31;  // choose p = 53 if both uppercase and lowercase letters
-                       // are allowed
     int p_power = 1;
     vector<int> hash_values(n, 0);
     for (int i = 0; i < n; i++) {
@@ -70,10 +73,8 @@ vector<int> compute_prefix_hash(const string& s) {
     }
     return hash_values;
 }
-vector<int> compute_suffix_hash(const string& s) {
+vector<int> compute_suffix_hash(const string& s, const int p, const int MOD) {
     const int n = s.size();
-    const int p = 31;  // choose p = 53 if both uppercase and lowercase letters
-                       // are allowed
     int p_power = 1;
     vector<int> hash_values(n, 0);
     for (int i = n - 1; i >= 0; i--) {
@@ -84,77 +85,20 @@ vector<int> compute_suffix_hash(const string& s) {
     }
     return hash_values;
 }
-int prefix_hash(vector<int>& pref, int l, int r, const int p = 31) {
+int prefix_hash(vector<int>& pref, vector<int>& INV, int l, int r, const int p,
+                const int MOD) {
     // call precompute() first
     if (l == 0) return pref[r];
     int inv = INV[l];
     int val = (pref[r] + 0LL - pref[l - 1] + MOD) % MOD;
     return (inv * 1LL * val) % MOD;
 }
-int suffix_hash(vector<int>& suf, int l, int r, const int p = 31) {
+int suffix_hash(vector<int>& suf, vector<int>& INV, int l, int r, const int p,
+                const int MOD) {
     // call precompute() first
     const int n = suf.size();
     if (r == n - 1) return suf[l];
     int inv = INV[n - 1 - r];
     int val = (suf[l] + 0LL - suf[r + 1] + MOD) % MOD;
     return (inv * 1LL * val) % MOD;
-}
-string longestPalindromicSubstring(const string& s) {
-    const int n = s.size();
-    vector<int> prefix_hash_values = compute_prefix_hash(s);
-    vector<int> suffix_hash_values = compute_suffix_hash(s);
-    int start = 0, end = 0;
-    int low, high, middle;
-    for (int i = 0; i < n; i++) {
-        if (min(2 * min(n - 1 - i, i) + 1, 2 * min(n - 1 - i, i - 1) + 2) <=
-            end - start + 1)
-            continue;  // i + 1 + (n - 1 -i) is the best possible result from
-                       // this position
-        // odd lengthed ones
-        low = 0;
-        high = min(i, n - 1 - i);
-        while (low <= high) {
-            middle = (low + high) / 2;
-            if (prefix_hash(prefix_hash_values, i - middle, i + middle) ==
-                suffix_hash(suffix_hash_values, i - middle, i + middle)) {
-                if (2 * middle + 1 > end - start + 1) {
-                    end = i + middle;
-                    start = i - middle;
-                }
-                low = middle + 1;
-            } else
-                high = middle - 1;
-        }
-        // even lengthed ones  3, 2, 1 < "string" > 0, 1, 2
-        low = 0;
-        high = min(n - 1 - i, i - 1);
-        while (low <= high) {
-            middle = (low + high) / 2;
-            if (prefix_hash(prefix_hash_values, i - middle - 1, i + middle) ==
-                suffix_hash(suffix_hash_values, i - middle - 1, i + middle)) {
-                if (2 * middle + 2 > end - start + 1) {
-                    end = i + middle;
-                    start = i - middle - 1;
-                }
-                low = middle + 1;
-            } else
-                high = middle - 1;
-        }
-        // even lengthed ones 2, 1, 0 < "string" > 1, 2, 3
-        low = 0;
-        high = min(n - 2 - i, i);
-        while (low <= high) {
-            middle = (low + high) / 2;
-            if (prefix_hash(prefix_hash_values, i - middle, i + middle + 1) ==
-                suffix_hash(suffix_hash_values, i - middle, i + middle + 1)) {
-                if (2 * middle + 2 > end - start + 1) {
-                    end = i + middle + 1;
-                    start = i - middle;
-                }
-                low = middle + 1;
-            } else
-                high = middle - 1;
-        }
-    }
-    return s.substr(start, end - start + 1);
 }

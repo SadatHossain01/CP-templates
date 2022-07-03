@@ -5,17 +5,17 @@ using namespace std;
 
 const int MX = 2e5 + 10;
 array<int, MX> factorial;
-const int MOD = 1e9 + 7;
+const int MOD1 = 1e9 + 7;
 inline int add(int a, int b) {
     a += b;
-    while (a >= MOD) a -= MOD;
-    while (a < 0) a += MOD;
+    while (a >= MOD1) a -= MOD1;
+    while (a < 0) a += MOD1;
     return a;
 }
 inline void add_self(int& a, int b) { a = add(a, b); }
 inline int sub(int a, int b) { return add(a, -b); }
 inline void sub_self(int& a, int b) { a = sub(a, b); }
-inline int mul(int a, int b) { return (a * 1LL * b) % MOD; }
+inline int mul(int a, int b) { return (a * 1LL * b) % MOD1; }
 inline void mul_self(int& a, int b) { a = mul(a, b); }
 int power(int a, int b) {
     int ans = 1;
@@ -44,7 +44,7 @@ int modInverse(int a, int m) {
     return x;
 }
 
-inline int divide(int a, int b) { return mul(a, modInverse(b, MOD)); }
+inline int divide(int a, int b) { return mul(a, modInverse(b, MOD1)); }
 inline void divide_self(int& a, int b) { a = divide(a, b); }
 void precompute() {
     factorial[0] = 1;

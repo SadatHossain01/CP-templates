@@ -4,7 +4,7 @@ using namespace std;
 #define endl "\n"
 typedef long long ll;
 
-const int MOD = 1e9 + 7;
+const int MOD1 = 1e9 + 7;
 
 struct Matrix {
     int r, c;
@@ -43,8 +43,8 @@ Matrix mul(Matrix &a, Matrix &b) {
         for (int i = 0; i < b.mat.size(); i++) {
             for (int k = 0; k < b.mat[0].size(); k++) {
                 product.mat[j][k] = (product.mat[j][k] + 0LL +
-                                     (a.mat[j][i] * 1LL * b.mat[i][k]) % MOD) %
-                                    MOD;
+                                     (a.mat[j][i] * 1LL * b.mat[i][k]) % MOD1) %
+                                    MOD1;
             }
         }
     }
