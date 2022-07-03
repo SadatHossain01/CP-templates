@@ -35,21 +35,23 @@ void dfs(int v, int parent) {
         dfs(neighbour, v);
     }
 }
-int get_distance_between_nodes_of_a_tree(int a, int b) {
-    static bool isDFSdone = false;
-    if (!isDFSdone) {
-        dfs(1, -1);
-        isDFSdone = true;
+
+// call dfs(root, -1) before any of the following functions
+
+int getKthAncestor(int u, int k) {
+    // make sure dfs(root, -1) has been called
+    if (depth[u] < k) return -1;
+    for (int j = LOG - 1; j >= 0; j--) {
+        if (k & (1 << j)) u = up[u][j];
     }
+    return u;
+}
+int getDistanceBetweenNodes(int a, int b) {
+    // make sure dfs(root, -1) has been called
     if (depth[a] < depth[b]) swap(a, b);
     int distance = 0;
     int k = depth[a] - depth[b];
-    for (int j = LOG - 1; j >= 0; j--) {
-        if (k & (1 << j)) {
-            distance += (1 << j);
-            a = up[a][j];
-        }
-    }
+    a = getKthAncestor(a, k);
     if (a == b) return distance;
     for (int j = LOG - 1; j >= 0; j--) {
         if (up[a][j] != up[b][j]) {
@@ -60,20 +62,12 @@ int get_distance_between_nodes_of_a_tree(int a, int b) {
     }
     return distance + 2;
 }
+
 int get_LCA(int a, int b) {
-    static bool isDFSdone = false;
-    if (!isDFSdone) {
-        dfs(0);
-        // or, dfs(0, -1);
-        isDFSdone = true;
-    }
+    // make sure dfs(root, -1) has been called
     if (depth[a] < depth[b]) swap(a, b);
     int k = depth[a] - depth[b];
-    for (int j = LOG - 1; j >= 0; j--) {
-        if (k & (1 << j)) {
-            a = up[a][j];
-        }
-    }
+    a = getKthAncestor(a, k);
     if (a == b) return a;
     for (int j = LOG - 1; j >= 0; j--) {
         if (up[a][j] != up[b][j]) {

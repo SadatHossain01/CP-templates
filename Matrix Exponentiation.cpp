@@ -2,79 +2,82 @@
 using namespace std;
 
 #define endl "\n"
-#define int long long
+typedef long long ll;
+
 const int MOD = 1e9 + 7;
 
-/*
-g_n = a_1 g_(n-1) + a_2 g_(n-2) + a_3 g_(n-3) + ... + a_k g_(n-k)
-[a1 a2 a3 ... ak
-1 0 0 ... 0
-0 1 0 ... 0
-0 0 1 ... 0
-0 0 0 ... 0] ^ (n - k) dimension: (k + 1) x k
-x
-[b_1
-b_2
-b_3
-...
-b_k] dimension: k x 1 (b1, b2, ..., bk are the first k elements of the sequence)
-=
-[g_n
-g_n-1
-g_n-2
-...
-g_n-k+1]
-*/
-
 struct Matrix {
-    int nums[2][2];
-    void print() {
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 2; j++) {
-                cout << nums[i][j] << " ";
-            }
-            cout << endl;
+    int r, c;
+    vector<vector<int>> mat;
+    Matrix(int r, int c) {
+        this->r = r, this->c = c;
+        mat.assign(r, vector<int>(c, 0));
+    }
+    Matrix(vector<vector<int>> &vec) {
+        r = vec.size();
+        c = vec[0].size();
+        mat.assign(r, vector<int>(c, 0));
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) mat[i][j] = vec[i][j];
         }
     }
 };
 
+istream &operator>>(istream &in, Matrix &mt) {
+    for (int i = 0; i < mt.r; i++)
+        for (int j = 0; j < mt.c; j++) in >> mt.mat[i][j];
+    return in;
+}
+ostream &operator<<(ostream &out, Matrix &mt) {
+    for (int i = 0; i < mt.r; i++) {
+        for (int j = 0; j < mt.c; j++) out << mt.mat[i][j] << " ";
+        out << endl;
+    }
+    return out;
+}
+
 Matrix mul(Matrix &a, Matrix &b) {
-    Matrix temp{{{0, 0}, {0, 0}}};
-    for (int j = 0; j < 2; j++) {
-        for (int i = 0; i < 2; i++) {
-            for (int k = 0; k < 2; k++) {
-                temp.nums[j][k] =
-                    (temp.nums[j][k] + (a.nums[j][i] * b.nums[i][k]) % MOD) %
-                    MOD;
+    // assert(a.mat[0].size() == b.mat.size());
+    Matrix product(a.mat.size(), b.mat[0].size());
+    for (int j = 0; j < a.mat.size(); j++) {
+        for (int i = 0; i < b.mat.size(); i++) {
+            for (int k = 0; k < b.mat[0].size(); k++) {
+                product.mat[j][k] = (product.mat[j][k] + 0LL +
+                                     (a.mat[j][i] * 1LL * b.mat[i][k]) % MOD) %
+                                    MOD;
             }
         }
     }
-    return temp;
+    return product;
 }
 
-Matrix power(Matrix a, int b) {
-    Matrix temp{{{1, 0}, {0, 1}}};
+Matrix power(Matrix a, ll b) {
+    // assert(a.mat.size() == a.mat[0].size());
+    Matrix ans(a.mat.size(), a.mat.size());
+    for (int i = 0; i < ans.mat.size(); i++) ans.mat[i][i] = 1;
     while (b) {
-        if (b % 2) temp = mul(temp, a);
+        if (b & 1) ans = mul(ans, a);
         a = mul(a, a);
-        b /= 2;
+        b >>= 1;
     }
-    return temp;
+    return ans;
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int n;
-    cin >> n;
-    Matrix a;
-    a.nums[0][0] = 0;
-    a.nums[0][1] = 1;
-    a.nums[1][0] = 1;
-    a.nums[1][1] = 1;
-    Matrix ans = power(a, n);
+#ifndef ONLINE_JUDGE
+    freopen("in.txt", "r", stdin);
+    freopen("out.txt", "w", stdout);
+#endif
 
-    cout << ans.nums[1][0] << endl;
+    ll n;
+    cin >> n;
+    Matrix a(2, 2);
+    a.mat = {{0, 1}, {1, 1}};
+    Matrix ans = power(a, n);
+    // cout << ans << endl;
+    cout << ans.mat[1][0] << endl;
     return 0;
 }
