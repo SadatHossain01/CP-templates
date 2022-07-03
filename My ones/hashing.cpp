@@ -6,34 +6,53 @@ using namespace std;
 const int MX = 1e6 + 5;
 const int MOD = 1e9 + 7;
 int POWER[MX], INV[MX];
-inline int add(int a, int b) {
-    a += b;
-    while (a >= MOD) a -= MOD;
-    while (a < 0) a += MOD;
-    return a;
-}
-inline void add_self(int& a, int b) { a = add(a, b); }
-inline int sub(int a, int b) { return add(a, -b); }
-inline void sub_self(int& a, int b) { a = sub(a, b); }
-inline int mul(int a, int b) { return (a * 1LL * b) % MOD; }
-inline void mul_self(int& a, int b) { a = mul(a, b); }
 int power(int a, int b) {
     int ans = 1;
     while (b) {
-        if (b & 1) mul_self(ans, a);
-        mul_self(a, a);
+        if (b & 1) ans = (ans * 1LL * a) % MOD;
+        a = (a * 1LL * a) % MOD;
         b >>= 1;
     }
     return ans;
 }
-inline int inverse(int a) { return power(a, MOD - 2); }
+int gcd(int a, int b, int& x, int& y) {
+    x = 1, y = 0;
+    int x1 = 0, y1 = 1, a1 = a, b1 = b;
+    while (b1) {
+        int q = a1 / b1;
+        tie(x, x1) = make_tuple(x1, x - q * x1);
+        tie(y, y1) = make_tuple(y1, y - q * y1);
+        tie(a1, b1) = make_tuple(b1, a1 - q * b1);
+    }
+    return a1;
+}
+int modInverse(int a, int m) {
+    int x, y;
+    int g = gcd(a, m, x, y);
+    while (x < 0) x += m;
+    return x;
+}
+void precompute() {
+    const int p = 31;  // choose p = 53 if both uppercase and lowercase letters
+                       // are allowed
+    POWER[0] = 1;
+    INV[0] = 1;
+    int inv_of_p = modInverse(p, MOD);
+    for (int i = 1; i < MX; i++) {
+        POWER[i] = (POWER[i - 1] * 1LL * p) % MOD;
+        INV[i] = INV[i - 1];
+        INV[i] = (INV[i] * 1LL * inv_of_p) % MOD;
+    }
+}
 int compute_hash_for_a_string(const string& s) {
+    // call precompute() first
     const int p = 31;  // choose p = 53 if both uppercase and lowercase letters
                        // are allowed
     int hash_value = 0;
     const int n = s.size();
     for (int i = 0; i < n; i++) {
-        add_self(hash_value, mul(s[i] - 'a' + 1, power(p, i)));
+        int val = ((s[i] - 'a' + 1) * 1LL * POWER[i]) % MOD;
+        hash_value = (hash_value + 0LL + val) % MOD;
     }
     return hash_value;
 }
@@ -41,12 +60,13 @@ vector<int> compute_prefix_hash(const string& s) {
     const int n = s.size();
     const int p = 31;  // choose p = 53 if both uppercase and lowercase letters
                        // are allowed
-    int also = 1;
+    int p_power = 1;
     vector<int> hash_values(n, 0);
     for (int i = 0; i < n; i++) {
-        hash_values[i] = mul(also, s[i] - 'a' + 1);
-        if (i) add_self(hash_values[i], hash_values[i - 1]);
-        mul_self(also, p);
+        hash_values[i] = (p_power * 1LL * (s[i] - 'a' + 1)) % MOD;
+        if (i > 0)
+            hash_values[i] = (hash_values[i] + 0LL + hash_values[i - 1]) % MOD;
+        p_power = (p_power * 1LL * p) % MOD;
     }
     return hash_values;
 }
@@ -54,26 +74,30 @@ vector<int> compute_suffix_hash(const string& s) {
     const int n = s.size();
     const int p = 31;  // choose p = 53 if both uppercase and lowercase letters
                        // are allowed
-    int also = 1;
+    int p_power = 1;
     vector<int> hash_values(n, 0);
     for (int i = n - 1; i >= 0; i--) {
-        hash_values[i] = mul(also, s[i] - 'a' + 1);
-        if (i < n - 1) add_self(hash_values[i], hash_values[i + 1]);
-        mul_self(also, p);
+        hash_values[i] = (p_power * 1LL * (s[i] - 'a' + 1)) % MOD;
+        if (i < n - 1)
+            hash_values[i] = (hash_values[i] + 0LL + hash_values[i + 1]) % MOD;
+        p_power = (p_power * 1LL * p) % MOD;
     }
     return hash_values;
 }
 int prefix_hash(vector<int>& pref, int l, int r, const int p = 31) {
+    // call precompute() first
     if (l == 0) return pref[r];
-    int inv = inverse(power(p, l));
-    return mul(inv, sub(prefix_hash(pref, 0, r), prefix_hash(pref, 0, l - 1)));
+    int inv = INV[l];
+    int val = (pref[r] + 0LL - pref[l - 1] + MOD) % MOD;
+    return (inv * 1LL * val) % MOD;
 }
 int suffix_hash(vector<int>& suf, int l, int r, const int p = 31) {
+    // call precompute() first
     const int n = suf.size();
     if (r == n - 1) return suf[l];
-    int inv = inverse(power(p, n - 1 - r));
-    return mul(inv,
-               sub(suffix_hash(suf, l, n - 1), suffix_hash(suf, r + 1, n - 1)));
+    int inv = INV[n - 1 - r];
+    int val = (suf[l] + 0LL - suf[r + 1] + MOD) % MOD;
+    return (inv * 1LL * val) % MOD;
 }
 string longestPalindromicSubstring(const string& s) {
     const int n = s.size();
@@ -133,39 +157,4 @@ string longestPalindromicSubstring(const string& s) {
         }
     }
     return s.substr(start, end - start + 1);
-}
-void precompute_for_version_2() {
-    const int p = 31;  // choose p = 53 if both uppercase and lowercase letters
-                       // are allowed
-    POWER[0] = 1;
-    INV[0] = 1;
-    int inv_of_p = inverse(p);
-    for (int i = 1; i < MX; i++) {
-        POWER[i] = mul(POWER[i - 1], p);
-        INV[i] = INV[i - 1];
-        mul_self(INV[i], inv_of_p);
-    }
-}
-int compute_hash_for_a_string_version_2(const string& s) {
-    const int p = 31;  // choose p = 53 if both uppercase and lowercase letters
-                       // are allowed
-    int hash_value = 0;
-    const int n = s.size();
-    for (int i = 0; i < n; i++) {
-        add_self(hash_value, mul(s[i] - 'a' + 1, POWER[i]));
-    }
-    return hash_value;
-}
-int prefix_hash_version_2(vector<int>& pref, int l, int r, const int p = 31) {
-    if (l == 0) return pref[r];
-    int inv = INV[l];
-    return mul(inv, sub(prefix_hash_version_2(pref, 0, r),
-                        prefix_hash_version_2(pref, 0, l - 1)));
-}
-int suffix_hash_version_2(vector<int>& suf, int l, int r, const int p = 31) {
-    const int n = suf.size();
-    if (r == n - 1) return suf[l];
-    int inv = INV[n - 1 - r];
-    return mul(inv, sub(suffix_hash_version_2(suf, l, n - 1),
-                        suffix_hash_version_2(suf, r + 1, n - 1)));
 }
