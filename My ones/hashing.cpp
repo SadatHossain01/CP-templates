@@ -4,23 +4,15 @@ using namespace std;
 #define endl "\n"
 
 const int MX = 1e6 + 5;
-const int p1 = 31, p2 = 37;
+const int p1 = 137, p2 = 281;
 const int MOD1 = 1e9 + 7;
 const int MOD2 = 1e9 + 9;
+// Some back-up primes: 1072857881, 1066517951, 1040160883
 // use double hashing for caution
 // if both hash values match, then same string
 // else different
 vector<int> POWER1(MX), POWER2(MX);
 vector<int> INV1(MX), INV2(MX);
-int power(int a, int b, int MOD) {
-    int ans = 1;
-    while (b) {
-        if (b & 1) ans = (ans * 1LL * a) % MOD;
-        a = (a * 1LL * a) % MOD;
-        b >>= 1;
-    }
-    return ans;
-}
 int gcd(int a, int b, int& x, int& y) {
     x = 1, y = 0;
     int x1 = 0, y1 = 1, a1 = a, b1 = b;
@@ -40,8 +32,6 @@ int modInverse(int a, int m) {
 }
 void precompute(const int p, const int MOD, vector<int>& POWER,
                 vector<int>& INV) {
-    // 31 if single case
-    // choose p = 53 if both uppercase and lowercase letters
     POWER[0] = 1;
     INV[0] = 1;
     int inv_of_p = modInverse(p, MOD);
@@ -88,17 +78,33 @@ vector<int> compute_suffix_hash(const string& s, const int p, const int MOD) {
 int prefix_hash(vector<int>& pref, vector<int>& INV, int l, int r, const int p,
                 const int MOD) {
     // call precompute() first
+    assert(l <= r);
     if (l == 0) return pref[r];
     int inv = INV[l];
     int val = (pref[r] + 0LL - pref[l - 1] + MOD) % MOD;
     return (inv * 1LL * val) % MOD;
 }
+pair<int, int> getBothPrefixHashes(vector<int>& pref1, vector<int>& pref2,
+                                   int l, int r) {
+    pair<int, int> ans;
+    ans.first = prefix_hash(pref1, INV1, l, r, p1, MOD1);
+    ans.second = prefix_hash(pref2, INV2, l, r, p2, MOD2);
+    return ans;
+}
 int suffix_hash(vector<int>& suf, vector<int>& INV, int l, int r, const int p,
                 const int MOD) {
     // call precompute() first
     const int n = suf.size();
+    assert(l <= r);
     if (r == n - 1) return suf[l];
     int inv = INV[n - 1 - r];
     int val = (suf[l] + 0LL - suf[r + 1] + MOD) % MOD;
     return (inv * 1LL * val) % MOD;
+}
+pair<int, int> getBothSuffixHashes(vector<int>& suf1, vector<int>& suf2, int l,
+                                   int r) {
+    pair<int, int> ans;
+    ans.first = prefix_hash(suf1, INV1, l, r, p1, MOD1);
+    ans.second = prefix_hash(suf2, INV2, l, r, p2, MOD2);
+    return ans;
 }
