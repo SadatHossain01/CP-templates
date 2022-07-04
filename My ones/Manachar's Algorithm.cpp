@@ -8,7 +8,7 @@ int main() {
     cin >> s;
     const int n = s.size();
     vector<int> d1(n, 0);
-    // maximum odd length palindrome centered at i
+    // radius of maximum odd length palindrome centered at i
     // here d1[i] = the palindrome has d1[i] - 1 right characters from i
     // e.g. for aba, d1[1] = 2;
     for (int i = 0, l = 0, r = -1; i < n; i++) {
@@ -21,7 +21,7 @@ int main() {
         }
     }
     vector<int> d2(n, 0);
-    // maximum even length palindrome centered at i
+    // radius of maximum even length palindrome centered at i
     // here d2[i] = the palindrome has d2[i] - 1 right characters from i
     // e.g. for abba, d2[2] = 2;
     for (int i = 0, l = 0, r = -1; i < n; i++) {
