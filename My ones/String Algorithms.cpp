@@ -18,6 +18,28 @@ vector<int> getLPS(const string& pattern) {
     }
     return lps;
 }
+int KMPSearch(const string& text, const string& pattern,
+              const vector<int>& lps) {
+    // returns number of matches
+    const int m = pattern.size();
+    const int n = text.size();
+    // lps array for pattern
+    int i = 0, j = 0, match = 0;
+    while (i < n) {
+        if (pattern[j] == text[i]) i++, j++;
+        if (j == m) {
+            // match found at index i - j
+            match++;
+            j = lps[j - 1];
+        } else if (i < n && pattern[j] != text[i]) {
+            if (j != 0)
+                j = lps[j - 1];
+            else
+                i++;
+        }
+    }
+    return match;
+}
 
 vector<int> z_function(const string& s) {
     // z[i] is the length of the longest substring from i-th position
