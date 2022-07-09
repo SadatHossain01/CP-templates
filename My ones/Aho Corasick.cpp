@@ -48,7 +48,7 @@ int go(int v, char ch) {
     return trie[v].go[c];
 }
 
-vector<bool> patternCheck(const string& text, const vector<string>& patterns) {
+vector<int> patternCount(const string& text, const vector<string>& patterns) {
     // assuming one string once
     // if one string multiple times, do some mapping
     // so that one string is considered once in the trie
@@ -58,16 +58,16 @@ vector<bool> patternCheck(const string& text, const vector<string>& patterns) {
         cur = go(cur, text[i]);  // go to the next node from current
         q.push(cur);
     }
-    vector<bool> visited(trie.size() + 2, false);
-    vector<bool> ok(patterns.size() + 2, false);
+    // vector<bool> visited(trie.size() + 2, false);
+    vector<int> ok(patterns.size() + 2, 0);
     while (!q.empty()) {
         int now = q.front();
         q.pop();
-        visited[now] = true;
-        if (trie[now].leaf != -1) ok[trie[now].leaf] = true;
-        if (trie[now].link != -1 && !visited[trie[now].link])
+        // visited[now] = true;
+        if (trie[now].leaf != -1) ok[trie[now].leaf]++;
+        if (trie[now].link != -1 /*&& !visited[trie[now].link]*/)
             q.push(trie[now].link);
     }
-    // so strings for which ok is true are present in 'text' as substring
+    // so ok stores the number of occurences of each pattern in the text
     return ok;
 }
