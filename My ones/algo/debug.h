@@ -38,10 +38,7 @@ void _print(T t, V... v) {
     _print(v...);
 }
 
-#ifndef ONLINE_JUDGE
 #define debug(x...)               \
     cerr << "[" << #x << "] = ["; \
     _print(x)
-#else
-#define debug(x...)
-#endif
+// add a newline at the end

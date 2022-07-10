@@ -1,7 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#ifndef ONLINE_JUDGE
+// g++ -DLOCAL -O3 -std=c++14 .\a.cpp
+#ifdef LOCAL
 #include "algo/debug.h"
 #else
 #define debug(...)
@@ -16,7 +17,7 @@ int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
     freopen("in.txt", "r", stdin);
     freopen("out.txt", "w", stdout);
 #endif
