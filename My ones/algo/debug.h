@@ -37,6 +37,7 @@ void _print(T t, V... v) {
     if (sizeof...(v)) cerr << ", ";
     _print(v...);
 }
+
 #ifndef ONLINE_JUDGE
 #define debug(x...)               \
     cerr << "[" << #x << "] = ["; \

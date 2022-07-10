@@ -1,10 +1,10 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#ifdef LOCAL
+#ifndef ONLINE_JUDGE
 #include "algo/debug.h"
 #else
-#define debug(...) 69
+#define debug(...)
 #endif
 
 #define endl "\n"
