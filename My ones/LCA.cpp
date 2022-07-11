@@ -6,33 +6,20 @@ using namespace std;
 const int MX = 10000;
 const int LOG = __lg(MX - 1) + 1;
 int n;
-vector<vector<int>> children(MX);
-vector<vector<int>> adjacent(MX);
+vector<vector<int>> adj(MX);
 vector<vector<int>> up(
     MX, vector<int>(LOG));  // up[i][j] is the 2^j th ancestor of i
 vector<int> depth(MX);
 
-// this version is applicable if inputs are given in node-children form
-void dfs(int v) {
-    for (auto child : children[v]) {
-        depth[child] = depth[v] + 1;
-        up[child][0] = v;
+void dfs(int v, int p) {
+    for (int other : adj[v]) {
+        if (other == p) continue;
+        depth[other] = depth[v] + 1;
+        up[other][0] = v;
         for (int j = 1; j < LOG; j++) {
-            up[child][j] = up[up[child][j - 1]][j - 1];
+            up[other][j] = up[up[other][j - 1]][j - 1];
         }
-        dfs(child);
-    }
-}
-// this version is applicable if inputs are given in edge form
-void dfs(int v, int parent) {
-    for (auto neighbour : adjacent[v]) {
-        if (neighbour == parent) continue;
-        depth[neighbour] = depth[v] + 1;
-        up[neighbour][0] = v;
-        for (int j = 1; j < LOG; j++) {
-            up[neighbour][j] = up[up[neighbour][j - 1]][j - 1];
-        }
-        dfs(neighbour, v);
+        dfs(other, v);
     }
 }
 
@@ -49,8 +36,8 @@ int getKthAncestor(int u, int k) {
 int getDistanceBetweenNodes(int a, int b) {
     // make sure dfs(root, -1) has been called
     if (depth[a] < depth[b]) swap(a, b);
-    int distance = 0;
     int k = depth[a] - depth[b];
+    int distance = k;
     a = getKthAncestor(a, k);
     if (a == b) return distance;
     for (int j = LOG - 1; j >= 0; j--) {
