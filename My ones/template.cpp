@@ -3,7 +3,7 @@ using namespace std;
 
 // g++ -DLOCAL -O3 -std=c++14 .\a.cpp
 #ifdef LOCAL
-#include "algo/debug.h"
+#include "debug.h"
 #else
 #define debug(...)
 #endif
