@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// g++ -DLOCAL -O3 -std=c++14 .\a.cpp
+// g++ -fsanitize=address -static-libasan -g -DLOCAL -O3 -std=c++14 .\b.cpp
 #ifdef LOCAL
 #include "debug.h"
 #else
