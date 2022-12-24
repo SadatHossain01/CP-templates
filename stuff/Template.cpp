@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// g++ -fsanitize=address -static-libasan -g -DLOCAL -O3 -std=c++14 .\b.cpp
+// g++ -fsanitize=address -static-libasan -g -DLOCAL -O3 -std=c++14 b.cpp
 #ifdef LOCAL
 #include "debug.h"
 #else
@@ -18,8 +18,8 @@ int main() {
     cin.tie(NULL);
 
 #ifdef LOCAL
-    freopen("in.txt", "r", stdin);
-    freopen("out.txt", "w", stdout);
+    auto inn = freopen("in.txt", "r", stdin);
+    auto outt = freopen("out.txt", "w", stdout);
 #endif
 
     int t;
