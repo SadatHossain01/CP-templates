@@ -38,7 +38,7 @@ int sgn(long long val) { return val > 0 ? 1 : (val == 0 ? 0 : -1); }
 vector<Pt> seq;
 Pt translation;
 bool prepCalled = false;
-int n;
+int sz;
 
 bool pointInTriangle(Pt a, Pt b, Pt c, Pt point) {
     long long s1 = abs(a.cross(b, c));
@@ -49,7 +49,7 @@ bool pointInTriangle(Pt a, Pt b, Pt c, Pt point) {
 
 void prepare(vector<Pt> &points) {
     prepCalled = true;
-    n = points.size();
+    sz = points.size();
     int pos = 0;
 
     // ccw sorting, if input is not ccw sorted
@@ -57,14 +57,14 @@ void prepare(vector<Pt> &points) {
     // sort(points.begin(), points.end(), [](const Pt& a, const Pt& b){
     //     return ccwcomp(a, b);
     // });
-    for (int i = 1; i < n; i++) {
+    for (int i = 1; i < sz; i++) {
         if (lexComp(points[i], points[pos])) pos = i;
     }
     rotate(points.begin(), points.begin() + pos, points.end());
 
-    n--;
-    seq.resize(n);
-    for (int i = 0; i < n; i++) seq[i] = points[i + 1] - points[0];
+    sz--;
+    seq.resize(sz);
+    for (int i = 0; i < sz; i++) seq[i] = points[i + 1] - points[0];
     translation = points[0];
 }
 
@@ -76,20 +76,22 @@ bool pointInConvexPolygon(Pt point) {
     // because of the translation, p0 is essentially (0, 0) now
     // so no need to subtract it from every point then
 
+    // sz means n though, or vice versa
+    // replaced n with sz
     // first check if p lies in between p1 and pn
     if (seq[0].cross(point) != 0  // (p1 - p0) x (p - p0) = 0 means p is on the
                                   // line connecting p0 and p1
         &&
         sgn(seq[0].cross(point)) !=
-            sgn(seq[0].cross(seq[n - 1])))  // if (p1 - p0) x (p - p0) and (p1 -
-                                            // p0) x (pn - p0) have same sign
+            sgn(seq[0].cross(seq[sz - 1])))  // if (p1 - p0) x (p - p0) and (p1
+                                             // - p0) x (pn - p0) have same sign
         return false;
-    if (seq[n - 1].cross(point) != 0  // (pn - p0) x (p - p0) = 0 means p is on
-                                      // the line connecting p0 and pn
+    if (seq[sz - 1].cross(point) != 0  // (pn - p0) x (p - p0) = 0 means p is on
+                                       // the line connecting p0 and pn
         &&
-        sgn(seq[n - 1].cross(point)) !=
-            sgn(seq[n - 1].cross(seq[0])))  // if (pn - p0) x (p - p0) and (pn -
-                                            // p0) x (p1 - p0) have same sign
+        sgn(seq[sz - 1].cross(point)) !=
+            sgn(seq[sz - 1].cross(seq[0])))  // if (pn - p0) x (p - p0) and (pn
+                                             // - p0) x (p1 - p0) have same sign
         return false;
 
     if (seq[0].cross(point) ==
@@ -101,7 +103,7 @@ bool pointInConvexPolygon(Pt point) {
     // counter-clockwise from p with respect to p0 remember p1,...,pn are
     // seq[0],...,seq[n - 1] translated wrt p0 now
 
-    int l = 0, r = n - 1;
+    int l = 0, r = sz - 1;
     while (r - l > 1) {
         int mid = (l + r) / 2;
         // this means points[mid + 1] or seq[mid] (translated wrt p0) is to the
