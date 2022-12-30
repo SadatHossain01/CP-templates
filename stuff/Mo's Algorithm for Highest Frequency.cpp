@@ -66,7 +66,7 @@ void solve() {
     sort(queries.begin(), queries.end(), [&](const Query& p, const Query& q) {
         if (p.l / BLOCK_SIZE != q.l / BLOCK_SIZE)
             return make_pair(p.l, p.r) < make_pair(q.l, q.r);
-        return (p.l / BLOCK_SIZE & 1) ? (p.r < q.r) : (p.r > q.r);
+        return ((p.l / BLOCK_SIZE) & 1) ? (p.r < q.r) : (p.r > q.r);
     });
     for (int i = 0; i < q; i++) processQueries(queries[i]);
     sort(queries.begin(), queries.end(),
