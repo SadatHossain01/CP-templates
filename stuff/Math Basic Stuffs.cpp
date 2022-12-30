@@ -58,7 +58,7 @@ inline int nCr(int n, int r) {
         precompute();
         isPrecomputationDone = true;
     }
-    if (r > n) return 0;
+    if (r > n || n < 0 || r < 0) return 0;
     if (n == r || r == 0) return 1;
     return divide(factorial[n], mul(factorial[r], factorial[n - r]));
 }
@@ -68,7 +68,7 @@ inline int nPr(int n, int r) {
         precompute();
         isPrecomputationDone = true;
     }
-    if (r > n) return 0;
+    if (r > n || n < 0 || r < 0) return 0;
     if (r == 0) return 1;
     if (n == r) return factorial[n];
     return divide(factorial[n], factorial[n - r]);
