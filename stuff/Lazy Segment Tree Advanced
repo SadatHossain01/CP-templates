@@ -1,0 +1,240 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+// g++ -fsanitize=address -static-libasan -g -DLOCAL -O3 -std=c++14 b.cpp
+#ifdef LOCAL
+#include "debug.h"
+#else
+#define debug(...)
+#endif
+
+#define endl "\n"
+typedef long long ll;
+
+// solves LightOJ Rip Van Winkle's Code
+const int MX = 250015;
+vector<int> numbers(MX + 2, 0);
+
+typedef long long ll;
+struct seg_tree {
+    vector<ll> sum;
+    vector<ll> cntA, cntB, del, paramC;
+    vector<bool> pendingC;
+    const ll NEUTRAL_ELEMENT = 0LL;
+    inline int lc(int x) { return (x << 1); }        // left child
+    inline int rc(int x) { return ((x << 1) | 1); }  // right child
+    seg_tree(int n) {
+        sum.assign(4 * n, NEUTRAL_ELEMENT);
+        cntA.assign(4 * n, NEUTRAL_ELEMENT);
+        cntB.assign(4 * n, NEUTRAL_ELEMENT);
+        del.assign(4 * n, NEUTRAL_ELEMENT);
+        pendingC.assign(4 * n, false);
+        paramC.assign(4 * n, NEUTRAL_ELEMENT);
+    }
+    inline ll combine(ll a, ll b) { return a + b; }
+    inline void pushA(int at, int start, int end) {
+        if (at >= sum.size()) return;
+        bool leftOk = false, rightOk = false;
+        if (lc(at) < sum.size()) leftOk = true;
+        if (rc(at) < sum.size()) rightOk = true;
+        ll len = 0;
+        int mid = (start + end) >> 1;
+        // debug('A', at, start, end, sum[at], cntA[at], del[at]);
+        if (leftOk) {
+            int lx = lc(at);
+            len = mid - start + 1;
+            sum[lx] += del[at] * len + cntA[at] * (len * (len + 1)) / 2;
+            del[lx] += del[at];
+            cntA[lx] += cntA[at];
+        }
+
+        if (rightOk) {
+            int rx = rc(at);
+            len = end - mid;
+            sum[rx] += (del[at] + cntA[at] * (mid + 1 - start)) * len +
+                       cntA[at] * (len * (len + 1)) / 2;
+            // notice the cntA[at] * (mid - start + 1) part in the following (or
+            // aforementioned) expression reason for the 2nd part, 1 2 3 4 5 6
+            // 1 2 3             4 5 6
+            // so for the right child, there is a del = 3, (3 + 1) + (3 + 2) +
+            // (3 + 3)
+            del[rx] += del[at] + cntA[at] * (mid + 1 - start);
+            cntA[rx] += cntA[at];
+        }
+
+        cntA[at] = 0;
+        del[at] = 0;  // have already considered all del effects here, so no
+                      // need to bring them to pushB as well
+    }
+    inline void pushB(int at, int start, int end) {
+        if (at >= sum.size()) return;
+        bool leftOk = false, rightOk = false;
+        if (lc(at) < sum.size()) leftOk = true;
+        if (rc(at) < sum.size()) rightOk = true;
+        ll len = 0;
+        int mid = (start + end) >> 1;
+        // debug('B', at, start, end, sum[at], cntB[at], del[at]);
+        if (leftOk) {
+            int lx = lc(at);
+            len = mid - start + 1;
+            // similar reasoning as previous
+            sum[lx] += (del[at] + cntB[at] * (end - mid)) * len +
+                       cntB[at] * (len * (len + 1)) / 2;
+            del[lx] += del[at] + cntB[at] * (end - mid);
+            cntB[lx] += cntB[at];
+        }
+
+        if (rightOk) {
+            int rx = rc(at);
+            len = end - mid;
+            sum[rx] += del[at] * len + cntB[at] * (len * (len + 1)) / 2;
+            del[rx] += del[at];
+            cntB[rx] += cntB[at];
+        }
+
+        cntB[at] = 0;
+    }
+    inline void pushC(int at, int start, int end) {
+        if (at >= sum.size()) return;
+        if (!pendingC[at]) return;
+        bool leftOk = false, rightOk = false;
+        if (lc(at) < sum.size()) leftOk = true;
+        if (rc(at) < sum.size()) rightOk = true;
+        ll len = 0;
+        int mid = (start + end) >> 1;
+        // debug('C', at, start, end, sum[at], paramC[at], (int)pendingC[at]);
+        if (leftOk) {
+            int lx = lc(at);
+            len = mid - start + 1;
+            sum[lx] = len * paramC[at];
+            paramC[lx] = paramC[at];
+            pendingC[lx] = true;
+
+            del[lx] = cntA[lx] = cntB[lx] = 0;
+        }
+
+        if (rightOk) {
+            int rx = rc(at);
+            len = end - mid;
+            sum[rx] = len * paramC[at];
+            paramC[rx] = paramC[at];
+            pendingC[rx] = true;
+
+            del[rx] = cntA[rx] = cntB[rx] = 0;
+        }
+
+        pendingC[at] = false;
+        paramC[at] = 0;
+    }
+    inline void push_all(int at, int start, int end) {
+        pushC(at, start, end);
+        pushA(at, start, end);
+        pushB(at, start, end);
+    }
+    inline void pull(int at) {
+        // debug(at, sum[at], sum[lc(at)], sum[rc(at)]);
+        sum[at] = combine(sum[lc(at)], sum[rc(at)]);
+    }
+    // call build(1, 1, n)
+    void build(int at, int start, int end) {
+        if (start == end) {
+            sum[at] = numbers[start];
+            sum[at] = 0;
+            return;
+        }
+        int mid = (start + end) >> 1;
+        build(lc(at), start, mid);
+        build(rc(at), mid + 1, end);
+        pull(at);
+        return;
+    }
+    void update(int at, int start, int end, char ty, int st, int nd,
+                int x = 0) {
+        if (start > nd || end < st) return;
+        push_all(at, start, end);
+        ll len = end - start + 1;
+        if (start >= st && end <= nd) {
+            if (ty == 'A') {
+                cntA[at]++;
+                del[at] += start - st;
+                sum[at] += len * (start - st) + len * (len + 1) / 2;
+            } else if (ty == 'B') {
+                cntB[at]++;
+                del[at] += nd - end;
+                sum[at] += len * (nd - end) + len * (len + 1) / 2;
+            } else if (ty == 'C') {
+                pendingC[at] = true;
+                paramC[at] = x;
+                sum[at] = len * x;
+                cntA[at] = cntB[at] = del[at] = 0;
+            }
+            push_all(at, start, end);
+            return;
+        }
+        int mid = (start + end) >> 1;
+        update(lc(at), start, mid, ty, st, nd, x);
+        update(rc(at), mid + 1, end, ty, st, nd, x);
+        pull(at);
+    }
+    // for query [l, r] call query(1, 1, n, l, r)
+    ll query(int at, int start, int end, int q_left, int q_right) {
+        push_all(at, start, end);
+        if (start > q_right || end < q_left) return NEUTRAL_ELEMENT;
+        if (start >= q_left && end <= q_right) return sum[at];
+        int mid = (start + end) >> 1;
+        return combine(query(lc(at), start, mid, q_left, q_right),
+                       query(rc(at), mid + 1, end, q_left, q_right));
+    }
+    void show() {
+        debug(sum);
+        debug(cntA);
+        debug(cntB);
+        debug(del);
+        debug(paramC);
+        debug((int)pendingC);
+    }
+};
+
+void solve() {
+    int m;
+    cin >> m;
+    seg_tree seg(MX - 2);
+    int n = min(250005, MX - 1);
+    seg.build(1, 1, n);
+    for (int i = 1; i <= m; i++) {
+        char a;
+        cin >> a;
+        int st, nd;
+        cin >> st >> nd;
+        if (a == 'A') {
+            seg.update(1, 1, n, 'A', st, nd);
+        } else if (a == 'B') {
+            seg.update(1, 1, n, 'B', st, nd);
+        } else if (a == 'C') {
+            int x;
+            cin >> x;
+            seg.update(1, 1, n, 'C', st, nd, x);
+        } else if (a == 'S') {
+            cout << seg.query(1, 1, n, st, nd) << endl;
+        }
+        // seg.show();
+    }
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+#ifdef LOCAL
+    auto inn = freopen("in.txt", "r", stdin);
+    auto outt = freopen("out.txt", "w", stdout);
+#endif
+
+    int t;
+    cin >> t;
+
+    for (int tc = 1; tc <= t; tc++) {
+        cout << "Case " << tc << ":" << endl;
+        solve();
+    }
+}
