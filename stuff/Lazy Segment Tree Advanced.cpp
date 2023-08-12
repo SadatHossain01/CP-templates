@@ -11,135 +11,120 @@ using namespace std;
 #define endl "\n"
 typedef long long ll;
 
-// solves LightOJ Rip Van Winkle's Code
 const int MX = 250015;
 vector<int> numbers(MX + 2, 0);
 
+// solves LightOJ Rip Van Winkle's Code
+struct LazyStruct {
+    ll sum, cntA, cntB, del, paramC;
+    bool pendingC;
+};
+
 typedef long long ll;
 struct seg_tree {
-    vector<ll> sum;
-    vector<ll> cntA, cntB, del, paramC;
-    vector<bool> pendingC;
+    vector<LazyStruct> tree;
     const ll NEUTRAL_ELEMENT = 0LL;
     inline int lc(int x) { return (x << 1); }        // left child
     inline int rc(int x) { return ((x << 1) | 1); }  // right child
-    seg_tree(int n) {
-        sum.assign(4 * n, NEUTRAL_ELEMENT);
-        cntA.assign(4 * n, NEUTRAL_ELEMENT);
-        cntB.assign(4 * n, NEUTRAL_ELEMENT);
-        del.assign(4 * n, NEUTRAL_ELEMENT);
-        pendingC.assign(4 * n, false);
-        paramC.assign(4 * n, NEUTRAL_ELEMENT);
-    }
+    seg_tree(int n) { tree.assign(4 * n, {0, 0, 0, 0, 0, false}); }
     inline ll combine(ll a, ll b) { return a + b; }
     inline void pushA(int at, int start, int end) {
-        if (at >= sum.size()) return;
-        bool leftOk = false, rightOk = false;
-        if (lc(at) < sum.size()) leftOk = true;
-        if (rc(at) < sum.size()) rightOk = true;
+        if (at >= tree.size()) return;
         ll len = 0;
         int mid = (start + end) >> 1;
-        // debug('A', at, start, end, sum[at], cntA[at], del[at]);
-        if (leftOk) {
+
+        if (lc(at) < tree.size()) {
             int lx = lc(at);
             len = mid - start + 1;
-            sum[lx] += del[at] * len + cntA[at] * (len * (len + 1)) / 2;
-            del[lx] += del[at];
-            cntA[lx] += cntA[at];
+            tree[lx].sum +=
+                tree[at].del * len + tree[at].cntA * (len * (len + 1)) / 2;
+            tree[lx].del += tree[at].del;
+            tree[lx].cntA += tree[at].cntA;
         }
 
-        if (rightOk) {
+        if (rc(at) < tree.size()) {
             int rx = rc(at);
             len = end - mid;
-            sum[rx] += (del[at] + cntA[at] * (mid + 1 - start)) * len +
-                       cntA[at] * (len * (len + 1)) / 2;
-            // notice the cntA[at] * (mid - start + 1) part in the following (or
-            // aforementioned) expression reason for the 2nd part, 1 2 3 4 5 6
+            tree[rx].sum += tree[at].del * len +
+                            tree[at].cntA * (mid + 1 - start) * len +
+                            tree[at].cntA * (len * (len + 1)) / 2;
+            // notice the tree[at].cntA * (mid - start + 1) part
+            // reason for the 2nd part, 1 2 3 4 5 6
             // 1 2 3             4 5 6
-            // so for the right child, there is a del = 3, (3 + 1) + (3 + 2) +
-            // (3 + 3)
-            del[rx] += del[at] + cntA[at] * (mid + 1 - start);
-            cntA[rx] += cntA[at];
+            // so for the right child, there is a del = 3,
+            // (3 + 1) + (3 + 2) +(3 + 3)
+            tree[rx].del += tree[at].del + tree[at].cntA * (mid + 1 - start);
+            tree[rx].cntA += tree[at].cntA;
         }
 
-        cntA[at] = 0;
-        del[at] = 0;  // have already considered all del effects here, so no
-                      // need to bring them to pushB as well
+        tree[at].cntA = 0;
+        tree[at].del = 0;  // have pushed down all del and cntA stuffs
     }
     inline void pushB(int at, int start, int end) {
-        if (at >= sum.size()) return;
-        bool leftOk = false, rightOk = false;
-        if (lc(at) < sum.size()) leftOk = true;
-        if (rc(at) < sum.size()) rightOk = true;
+        if (at >= tree.size()) return;
         ll len = 0;
         int mid = (start + end) >> 1;
         // debug('B', at, start, end, sum[at], cntB[at], del[at]);
-        if (leftOk) {
+        if (lc(at) < tree.size()) {
             int lx = lc(at);
             len = mid - start + 1;
-            // similar reasoning as previous
-            sum[lx] += (del[at] + cntB[at] * (end - mid)) * len +
-                       cntB[at] * (len * (len + 1)) / 2;
-            del[lx] += del[at] + cntB[at] * (end - mid);
-            cntB[lx] += cntB[at];
+            tree[lx].sum += (tree[at].del + tree[at].cntB * (end - mid)) * len +
+                            tree[at].cntB * (len * (len + 1)) / 2;
+            tree[lx].del += tree[at].del + tree[at].cntB * (end - mid);
+            tree[lx].cntB += tree[at].cntB;
         }
 
-        if (rightOk) {
+        if (rc(at) < tree.size()) {
             int rx = rc(at);
             len = end - mid;
-            sum[rx] += del[at] * len + cntB[at] * (len * (len + 1)) / 2;
-            del[rx] += del[at];
-            cntB[rx] += cntB[at];
+            tree[rx].sum +=
+                tree[at].del * len + tree[at].cntB * (len * (len + 1)) / 2;
+            tree[rx].del += tree[at].del;
+            tree[rx].cntB += tree[at].cntB;
         }
 
-        cntB[at] = 0;
+        tree[at].cntB = 0;
     }
     inline void pushC(int at, int start, int end) {
-        if (at >= sum.size()) return;
-        if (!pendingC[at]) return;
-        bool leftOk = false, rightOk = false;
-        if (lc(at) < sum.size()) leftOk = true;
-        if (rc(at) < sum.size()) rightOk = true;
+        if (at >= tree.size()) return;
+        if (!tree[at].pendingC) return;
         ll len = 0;
         int mid = (start + end) >> 1;
         // debug('C', at, start, end, sum[at], paramC[at], (int)pendingC[at]);
-        if (leftOk) {
+        if (lc(at) < tree.size()) {
             int lx = lc(at);
             len = mid - start + 1;
-            sum[lx] = len * paramC[at];
-            paramC[lx] = paramC[at];
-            pendingC[lx] = true;
-
-            del[lx] = cntA[lx] = cntB[lx] = 0;
+            tree[lx].sum = len * tree[at].paramC;
+            tree[lx].paramC = tree[at].paramC;
+            tree[lx].pendingC = true;
+            tree[lx].cntA = tree[lx].cntB = tree[lx].del = 0;
         }
 
-        if (rightOk) {
+        if (rc(at) < tree.size()) {
             int rx = rc(at);
             len = end - mid;
-            sum[rx] = len * paramC[at];
-            paramC[rx] = paramC[at];
-            pendingC[rx] = true;
-
-            del[rx] = cntA[rx] = cntB[rx] = 0;
+            tree[rx].sum = len * tree[at].paramC;
+            tree[rx].paramC = tree[at].paramC;
+            tree[rx].pendingC = true;
+            tree[rx].cntA = tree[rx].cntB = tree[rx].del = 0;
         }
 
-        pendingC[at] = false;
-        paramC[at] = 0;
+        tree[at].pendingC = false;
+        tree[at].paramC = 0;
     }
     inline void push_all(int at, int start, int end) {
         pushC(at, start, end);
         pushA(at, start, end);
         pushB(at, start, end);
     }
-    inline void pull(int at) {
-        // debug(at, sum[at], sum[lc(at)], sum[rc(at)]);
-        sum[at] = combine(sum[lc(at)], sum[rc(at)]);
+    inline void pull(int at) {  // used in building and updating the tree,
+                                // pulling the leaf values to the root
+        tree[at].sum = combine(tree[lc(at)].sum, tree[rc(at)].sum);
     }
     // call build(1, 1, n)
     void build(int at, int start, int end) {
         if (start == end) {
-            sum[at] = numbers[start];
-            sum[at] = 0;
+            tree[at].sum = numbers[start];
             return;
         }
         int mid = (start + end) >> 1;
@@ -155,18 +140,18 @@ struct seg_tree {
         ll len = end - start + 1;
         if (start >= st && end <= nd) {
             if (ty == 'A') {
-                cntA[at]++;
-                del[at] += start - st;
-                sum[at] += len * (start - st) + len * (len + 1) / 2;
+                tree[at].cntA++;
+                tree[at].del += start - st;
+                tree[at].sum += len * (start - st) + len * (len + 1) / 2;
             } else if (ty == 'B') {
-                cntB[at]++;
-                del[at] += nd - end;
-                sum[at] += len * (nd - end) + len * (len + 1) / 2;
+                tree[at].cntB++;
+                tree[at].del += nd - end;
+                tree[at].sum += len * (nd - end) + len * (len + 1) / 2;
             } else if (ty == 'C') {
-                pendingC[at] = true;
-                paramC[at] = x;
-                sum[at] = len * x;
-                cntA[at] = cntB[at] = del[at] = 0;
+                tree[at].pendingC = true;
+                tree[at].paramC = x;
+                tree[at].sum = len * x;
+                tree[at].cntA = tree[at].cntB = tree[at].del = 0;
             }
             push_all(at, start, end);
             return;
@@ -180,7 +165,7 @@ struct seg_tree {
     ll query(int at, int start, int end, int q_left, int q_right) {
         push_all(at, start, end);
         if (start > q_right || end < q_left) return NEUTRAL_ELEMENT;
-        if (start >= q_left && end <= q_right) return sum[at];
+        if (start >= q_left && end <= q_right) return tree[at].sum;
         int mid = (start + end) >> 1;
         return combine(query(lc(at), start, mid, q_left, q_right),
                        query(rc(at), mid + 1, end, q_left, q_right));
