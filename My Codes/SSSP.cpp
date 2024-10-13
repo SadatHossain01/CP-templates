@@ -20,6 +20,11 @@ void dijkstra(int source, vector<ll>& dist, vector<int>& parent) {
     parent.assign(n, -1);
     vector<bool> visited(n + 2, false);
 
+    // auto Compare = [&](const auto& a, const auto& b){
+    //     return a.second > b.second;
+    // };
+    // priority_queue<pair<int, ll>, vector<pair<int, ll>>, decltype(Compare)> pq(Compare);
+
     dist[source] = 0;
     priority_queue<Edge, vector<Edge>, greater<Edge>> pq;
     pq.push({source, 0});

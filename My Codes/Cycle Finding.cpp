@@ -8,28 +8,28 @@ vector<int> parent;
 int cycle_start, cycle_end;
 
 bool dfs(int v) {
-    color[v] = 1;
+    color[v] = 'G';
     for (int u : adj[v]) {
-        if (color[u] == 0) {
+        if (color[u] == 'W') {
             parent[u] = v;
             if (dfs(u)) return true;
-        } else if (color[u] == 1) {
+        } else if (color[u] == 'G') {
             cycle_end = v;
             cycle_start = u;
             return true;
         }
     }
-    color[v] = 2;
+    color[v] = 'B';
     return false;
 }
 
 void find_cycle() {
-    color.assign(n, 0);
+    color.assign(n, 'W');
     parent.assign(n, -1);
     cycle_start = -1;
 
     for (int v = 0; v < n; v++) {
-        if (color[v] == 0 && dfs(v)) break;
+        if (color[v] == 'W' && dfs(v)) break;
     }
 
     if (cycle_start == -1) {
