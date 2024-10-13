@@ -17,10 +17,10 @@ int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
 
-#ifdef LOCAL
-    auto inn = freopen("in.txt", "r", stdin);
-    auto outt = freopen("out.txt", "w", stdout);
-#endif
+// #ifdef LOCAL
+//    auto inn = freopen("in.txt", "r", stdin);
+//    auto outt = freopen("out.txt", "w", stdout);
+// #endif
 
     int t;
     cin >> t;
